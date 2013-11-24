@@ -1,0 +1,36 @@
+{% extends 'cadastros/cadastrosBase.html' %}
+
+{% block terceiroNivel %} 
+<li><a href="http://localhost:8000/cadastros/{{ nomeTela }}/">{{ nomeTela }}</a></li> 
+{% endblock %}
+
+{% block head %}
+<h1><a href="http://localhost:8000/cadastros/">Cadastros</a> <small>
+  {% ifequal nomeTela "TipoEvento" %}
+    Tipo de Evento
+  {% else %}
+    {% ifequal nomeTela "ObjetosEvento" %}
+      Objetos do Evento
+    {% else %}
+      {{ nomeTela }}
+    {% endifequal %}
+  {% endifequal %} 
+</small></h1>
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+<div class="container">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h1 class="panel-title">Ações</h1>
+    </div>
+    <div class="panel-body">
+      <div class="btn-group btn-group-lg">
+          <a href="novo/"><button type="button" class="btn btn-success" ><i class="glyphicon glyphicon-plus"></i>    Novo cadastro</button></a>
+          <a href="buscar/"><button type="button" class="btn btn-success"><i class="glyphicon glyphicon-search"></i>      Buscar</button></a>
+      </div>
+      </div>
+  </div>
+</div>
+

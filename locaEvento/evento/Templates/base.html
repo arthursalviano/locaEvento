@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html Content-Type: "text/html"; charset="utf-8" lang="pt-br">
+  <head>
+    <title> Loca Evento </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="{% static "Bootstrap/css/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "Bootstrap/css/bootstrap-theme.min.css" %}">
+    <link rel="stylesheet" href="{% static "Bootstrap/css/bootstrap-responsive.min.css" %}">
+    <style >
+      .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url("{% static "Bootstrap/img/page-loader.gif" %}") 50% 50% no-repeat rgb(249,249,249);
+      }
+  </style>
+    
+    <!-- Bootstrap -->
+  </head>
+  <body>
+	  <ol class="breadcrumb">
+      <li><a class="btn" href="http://localhost:8000"><i class="glyphicon glyphicon-home"></i></a></li>
+      {% block segundoNivel %}{% endblock %}
+      {% block terceiroNivel %}{% endblock %}
+      {% block quartoNivel %}{% endblock %}
+      {% block quintoNivel %}{% endblock %}
+      {% block sextoNivel %}{% endblock %}
+    </ol>
+
+    <div class="container">  
+      <div class="page-header">
+        {% block head %}
+        <h1>LocaEvento <small>Sistema de controle de eventos</small></h1>
+        {% endblock %}
+      </div>
+    </div>
+    
+    <div class="loader">
+    </div>
+    
+   {% block content %} 
+   {% endblock %}
+ <!-- Latest compiled and minified JavaScript -->
+ 
+  <script src="{% static "jQuery/jquery-2.0.3.js" %}"></script>
+  <script src="{% static "Bootstrap/js/bootstrap.min.js" %}"></script>
+  <script src="{% static "Lib/jquery.maskedinput.min.js" %}"></script>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+      
+      $(window).load(function() {
+        $(".loader").fadeOut("slow");
+      }); 
+
+      {% block javascript %}
+      {% endblock %}
+      
+    });
+  </script>
+  </body>
+</html>

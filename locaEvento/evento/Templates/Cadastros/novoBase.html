@@ -1,0 +1,467 @@
+{% extends 'cadastros/detalhesBase.html' %}
+
+{% block javascript %}
+		
+		{# outros efeitos #}
+
+		$("#ButtonModal").hide();
+		$("#ButtonModal2").hide();
+		
+		{# máscaras #}
+
+		$("#contato").mask("(99) 9999-9999");
+		$("#RG").mask("999.999.999");
+		$("#CPF").mask("999.999.999-99");
+		$("#valorTotal").mask("9.999,99");
+
+		{# o botão que ativa a mensagem de salvo com sucesso é ativado aqui. #}
+		
+		{% ifequal msg "Salvo" %}
+			$('#ButtonModal').trigger("click");
+		{% endifequal %}
+
+
+		{# o botão que ativa o modal para redirecionar os cadastros necessários é feita aqui#}
+
+		{% if msg != "Salvo" %}
+			{% if nomeTela == "Bairro" %} 
+	        	{% if not cidades %}
+	        		$('#ButtonModal2').trigger("click");
+	        	{% endif %}
+	    	{% endif %}
+	    {% endif %}
+	        
+
+	    {# comportamento dos botões modais (Salvo com sucesso e redirecionamento de cadastros necessários) #}
+
+		$('#botaoOk').click(
+			function(){
+				$(location).attr('href','http://localhost:8000/cadastros/{{ nomeTela }}/detalhes/');
+			}
+		);
+
+		$('#botaoOk2').click(
+			function(){
+				{% if nomeTela == 'Bairro' %} 
+					$(location).attr('href','http://localhost:8000/cadastros/Cidade/novo/');
+				{% endif %}
+			}
+		);
+
+		{# aqui são setados os combos em caso de edição #}
+
+		{% ifequal editar "editar" %}
+			$('#UF').val("{{ obj.estado }}");
+			$('#bairroCidade').val("{{ obj.cidade.id }}");
+			
+		{% endifequal %}
+
+
+		$( "#clienteCidade" ).change(function() {
+				var path = "http://localhost:8000/cadastros/{{ nomeTela }}/pesquisar/"+ $('#clienteCidade').val()+"/";
+  				$(location).attr('href',path)
+		});
+		
+	
+{% endblock %}
+
+
+{% block title %}
+	<title>Cadastro de  {{ nomeTela }}</title> 
+{% endblock %}
+
+{% block quartoNivel %} 
+	<li><a href="http://localhost:8000/cadastros/{{ nomeTela }}/novo">Novo</a></li>
+{% endblock %}
+
+{% block head %}
+	<h1>
+	{% ifequal nomeTela "TipoEvento" %}
+		Tipo de Evento
+	{% else %}
+		{% ifequal nomeTela "ObjetosEvento" %}
+			Objetos do Evento
+		{% else %}
+			{{ nomeTela }}
+		{% endifequal %}
+	{% endifequal %}
+	<small> - Adicionar novo(a) </small></h1>
+{% endblock %}
+
+{% block content %}
+	<div class="container">	
+		<form role="form" method="POST" class="form-horizontal"
+		{% block formHeader %}
+		action="salvar/"
+		{% endblock %}>
+	
+	<!-- Formulário Bairro -->
+
+	{% ifequal nomeTela "Bairro" %}
+		<div class="form-group">
+			<div class="col-xs-4">
+		    	<label for="descricao" >Descrição</label>
+		   	 	<input type="text" class="form-control" id="descricao" name="descricao" placeholder="Descrição" 
+		    
+		    {% ifequal editar "editar" %}
+		    	value="{{ obj.descricao }}"
+		    {% endifequal %}
+
+		    required>
+			</div>
+		</div>
+		<div class="form-group">
+			    <div class="col-xs-4">
+					<label for="bairroCidade">Cidade</label>
+				    <select class="form-control" id="bairroCidade" name="bairroCidade" required>
+		  				{% for cidade in cidades %}
+		  					<option value="{{ cidade.id }}">{{ cidade.descricao }}</option>
+		  				{% endfor %}
+					</select>
+				</div>
+		</div>
+	{% endifequal %}
+
+	<!-- Formulário Cidade -->
+
+	{% ifequal nomeTela "Cidade" %}
+		<div class="form-group">
+			<div class="col-xs-4">
+		    	<label for="descricao" >Descrição</label>
+		   	 	<input type="text" class="form-control" id="descricao" name="descricao" placeholder="Descrição" 
+		    
+		    {% ifequal editar "editar" %}
+		    	value="{{ obj.descricao }}"
+		    {% endifequal %}
+
+		    required>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-xs-4">
+				<label for="UF">UF</label>
+			    <select class="form-control" id="UF" name="UF" required>
+	  				<option value="AC">ACRE</option>
+					<option value="AL">ALAGOAS</option>
+					<option value="AP">AMAPÁ</option>
+					<option value="AM">AMAZONAS</option>
+					<option value="BA">BAHIA</option>
+					<option value="CE">CEARÁ</option>
+					<option value="DF">DISTRITO FEDERAL</option>
+					<option value="ES">ESPIRÍTO SANTO</option>
+					<option value="GO">GOIÁS</option>
+					<option value="MA">MARANHÃO</option>
+					<option value="MT">MATO GROSSO</option>
+					<option value="MS">MATO GROSSO DO SUL</option>
+					<option value="MG">MINAS GERAIS</option>
+					<option value="PA">PARÁ</option>
+					<option value="PB">PARAÍBA</option>
+					<option value="PR">PARANÁ</option>
+					<option value="PE">PERNAMBUCO</option>
+					<option value="PI">PIAUÍ</option>
+					<option value="RJ">RIO DE JANEIRO</option>
+					<option value="RN" >RIO GRANDE DO NORTE</option>
+					<option value="RS">RIO GRANDE DO SUL</option>
+					<option value="RO">RONDÔNIA</option>
+					<option value="RR">RORAIMA</option>
+					<option value="SC">SANTA CATARINA</option>
+					<option value="SP">SÃO PAULO</option>
+					<option value="SE">SERGIPE</option>
+					<option value="TO">TOCANTINS</option>
+				</select>
+			</div>
+		</div>
+	{% endifequal %}
+
+
+	<!-- Formulário Tipo de evento -->
+
+
+	{% ifequal nomeTela "TipoEvento" %}
+		<div class="form-group">
+			<div class="col-xs-3">
+			    <label for="descricao" >Descrição</label>
+			    <input type="text" class="form-control" id="descricao" name="descricao" placeholder="Descrição" 
+			    {% ifequal editar "editar" %}
+			    	value="{{ obj.descricao }}"
+			    {% endifequal %}
+			    required>
+			</div>
+		</div>
+	{% endifequal %}
+
+	<!-- Formulário Cor -->
+
+	{% ifequal nomeTela "Cor" %}
+		<div class="form-group">
+		    <div class="col-xs-3">
+		    	<label for="descricao" >Descrição</label>
+		    	<input type="text" class="form-control" id="descricao" name="descricao" placeholder="Descrição" 
+		    	{% ifequal editar "editar" %}
+		    		value="{{ obj.descricao }}"
+		    	{% endifequal %}
+		    	required>
+		    </div>
+		</div>
+	{% endifequal %}
+
+
+	<!--Formulário Objetos do Evento -->
+
+	{% ifequal nomeTela "ObjetosEvento" %}
+		<div class="form-group">
+			<div class="col-xs-3">
+			    <label for="descricao" >Descrição</label>
+			    <input type="text" class="form-control" id="descricao" name="descricao" placeholder="Descrição"
+			    {% ifequal editar "editar" %}
+			    	value="{{ obj.descricao }}"
+			    {% endifequal %}
+			     required>
+			</div>
+		</div>
+	{% endifequal %}
+
+	<!-- Formulário Cliente -->
+
+	{% ifequal nomeTela "Cliente" %}
+		
+		
+		<div class="form-group">
+		    <div class="panel panel-primary">
+		  		<div class="panel-heading">
+		    		<h1 class="panel-title"><strong>DADOS PESSOAIS</strong></h1>
+		  		</div>
+		  		<div class="panel-body">
+				    <div class="col-xs-6">
+				    	<label class="control-label" for="nome" >Nome</label>
+		    			<input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" required>
+		  			</div>
+		  			<div class="col-xs-3">
+				    	<label class="control-label" for="CPF" >CPF</label>
+				    	<input type="text" class="form-control" id="CPF" name="CPF" placeholder="CPF" required>
+		  			</div>
+		  			<div class="col-xs-3">
+				    	<label class="control-label" for="RG" >RG</label>
+				    	<input type="text" class="form-control" id="RG" name="RG" placeholder="RG" required>
+		  			</div>
+		  		</div>
+		  		<div class="panel-body">
+				    <div class="col-xs-5">
+				    	<label class="control-label" for="email" >E-mail</label>
+		    			<input type="email" class="form-control" id="email" name="email" placeholder="email" required>
+		  			</div>
+		  			<div class="col-xs-2">
+				    	<label class="control-label" for="date" >Data de nascimento</label>
+		    			<input type="date" class="form-control" id="dataNascimento" name="dataNascimento" placeholder="Data de Nascimento" required>
+		  			</div>
+		  		</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="panel panel-primary">
+		  		<div class="panel-heading">
+		    		<h1 class="panel-title"><strong>ENDEREÇO</strong></h1>
+		  		</div>
+		  		<div class="panel-body">
+		    		<div class="form-group">
+		    		<div class="col-xs-6">
+				    	<label class="control-label" for="logradouro" >Logradouro</label>
+				    	<input type="text" class="form-control" id="logradouro" name="logradouro" placeholder="Logradouro" required>
+					</div>
+					<div class="col-xs-2">
+				    	<label for="numero" >Número</label>
+				    	<input type="text" class="form-control" id="numero" name="numero" placeholder="Número" required>
+					</div>
+					
+				</div>
+				<div class="form-group">
+					<div class="col-xs-3">
+						<label for="clienteCidade">Cidade</label>
+				    	<select class="form-control" id="clienteCidade" name="clienteCidade" required>
+		  				{% for cidade in cidades %}
+		  					<option value="{{ cidade.id }}">{{ cidade.descricao }}</option>
+		  				{% endfor %}
+						</select>
+					</div>
+					<div class="col-xs-3">
+						<label for="clienteBairro">Bairro</label>
+				    	<select class="form-control" id="clienteBairro" name="clienteBairro" required>
+		  				{% for bairro in bairros %}
+		  					<option value="{{ bairro.id }}">{{ bairro.descricao }}</option>
+		  				{% endfor %}
+						</select>
+					</div>
+				</div>
+		  		</div>
+		  	</div>
+	  	</div>
+	  	<div class="form-group">
+			<div class="col-xs-4">
+			    <label for="comoConheceu" >Como conheceu?</label>
+			    <input type="text" class="form-control" id="comoConheceu" name="comoConheceu" placeholder="Como conheceu?" required>
+			</div>
+			<div class="col-xs-2">
+				<label for="eventoAnterior">Evento anterior?</label>
+			    <select class="form-control" id="eventoAnterior" name="eventoAnterior" required>
+	  					<option value="Sim">Sim</option>
+	  					<option value="Não">Não</option>
+				</select>
+			</div>
+		</div>
+	{% endifequal %}
+
+	<!-- Formulário Evento -->
+
+	{% ifequal nomeTela "Evento" %}
+		<div class="form-group">
+		    <div class="col-xs-2">
+			    <label for="data" >Data</label>
+			    <input type="date" class="form-control" id="data" name="data" placeholder="Data" required>
+			</div>
+			<div class="col-xs-3">
+					<label for="TipoEvento">Tipo de Evento</label>
+				    <select class="form-control" id="TipoEvento" name="TipoEvento" required>
+		  				{% for tipo in tiposEvento %}
+		  					<option value="{{ tipo.id }}">{{ tipo.descricao }}</option>
+		  				{% endfor %}
+					</select>
+			</div>
+			<div class="col-xs-5">
+					<label for="Cliente">Cliente</label>
+				    <select class="form-control" id="Cliente" name="Cliente" required>
+		  				{% for cliente in clientes %}
+		  					<option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+		  				{% endfor %}
+					</select>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-xs-4">
+					<label for="ObjetosEvento">Objetos</label>
+				    <select class="form-control" id="ObjetosEvento" name="ObjetosEvento" multiple required>
+		  				{% for objeto in objetosEvento %}
+		  					<option value="{{ objeto.id }}">{{ objeto.descricao }}</option>
+		  				{% endfor %}
+					</select>
+			</div>
+			<div class="col-xs-2">
+				<label for="ObjetosEvento">Pagará a limpeza?</label>
+				<div class="radio">
+				  <label>
+				    <input type="radio" name="pagaraLimpeza" id="pagaraSim" value="Sim" checked>
+				    Sim
+				  </label>
+				</div>
+				<div class="radio">
+				  <label>
+				    <input type="radio" name="pagaraLimpeza" id="pagaraNao" value="Não">
+				    Não
+				  </label>
+				</div>
+			</div>
+			<div class="col-xs-2">
+				<label for="horaInicio" >Hora de início </label>
+		    	<input type="time" class="form-control" id="horaInicio" name="horaInicio" placeholder="Hora de Início" required>
+			</div>
+			<div class="col-xs-2">
+		    	<label for="horaTérmino" >Hora de término</label>
+		    	<input type="time" class="form-control" id="horaTermino" name="horaTermino" placeholder="Hora de Término" required>
+			</div>		
+		</div>
+		<div class="form-group">
+			<div class="col-xs-2">
+		    	<label for="numCobertas" >Número de cobertas</label>
+		    	<input type="number" class="form-control" id="numCobertas" name="numCobertas" placeholder="Número de cobertas" required>
+			</div>
+			<div class="col-xs-3">
+		    	<label for="Cor" >Cor da coberta</label>
+		    	<select class="form-control" id="Cor" name="Cor" required>
+		  				{% for cor in cores %}
+		  					<option value="{{ cor.id }}">{{ cor.descricao }}</option>
+		  				{% endfor %}
+					</select>
+			</div>
+			<div class="col-xs-3">
+		    	<label for="valorTotal">Valor Total do evento</label>
+		    	<input type="text" class="form-control" id="valorTotal" name="valorTotal" placeholder="Valor Total" required>
+			</div>
+		</div>
+	{% endifequal %}
+
+	<!-- Formulário Contato -->
+
+	{% ifequal nomeTela "Contato" %}
+		<div class="form-group">
+		    <label for="contato" >Contato</label>
+		    <input type="text" class="form-control" id="contato" name="contato" placeholder="Contato" required>
+		</div>
+
+		<div class="form-group">
+			<label for="cliente">Cliente</label>
+		    <select class="form-control" id="cliente" name="cliente" required>
+  				{% for cliente in clientes %}
+  					<option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+  				{% endfor %}
+			</select>
+		</div>
+	{% endifequal %}
+		
+		{% block botoes %}
+		<div class="form-actions">
+  			<button type="submit" class="btn btn-primary btn-lg" ><i class="glyphicon glyphicon-plus-sign glyphicon-white"></i> Salvar</button>
+  			<a class="btn btn-danger btn-lg" href="http://localhost:8000/cadastros/{{ nomeTela }}/"><i class="glyphicon glyphicon-remove-sign glyphicon-white"></i> Cancelar</a>
+  		</div>
+  		{% endblock %}
+		</form>
+	</div>
+
+{% block modal %}
+	<!-- Modal -->
+	<div class="modal fade" id="salvoComSucesso" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h2 class="modal-title" id="myModalLabel">Salvo!</h2>
+	      </div>
+	      <div class="modal-body">
+	        <h4>Cadastro realizado com sucesso!</h4>
+	      </div>
+	      <div class="modal-footer">
+	        <button id="botaoOk" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	<div class="modal fade" id="avisoTabelasNecessárias" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h2 class="modal-title" id="myModalLabel">Aviso</h2>
+	      </div>
+	      <div class="modal-body">
+	        <h4>
+	        {% if nomeTela == "Bairro" %} 
+	        	{% if not cidades %}
+	        	Para cadastrar um Bairro é necessário primeiro cadastrar alguma cidade. Você será redirecionado para a tela de cadastro de Cidade.
+	        	{% endif %}
+	       {% endif %}
+	       </h4>
+	      </div>
+	      <div class="modal-footer">
+	        <button id="botaoOk2" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+{% endblock %}
+
+
+<a id="ButtonModal" href="#salvoComSucesso" role="button" class="btn" data-toggle="modal">Clique para mostrar o modal</a>
+<a id="ButtonModal2"  href="#avisoTabelasNecessárias" role="button" class="btn" data-toggle="modal">Clique para mostrar o modal</a>
+
+</div>
+{% endblock %}

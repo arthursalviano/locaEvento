@@ -1,0 +1,371 @@
+{% extends 'cadastros/crudBase.html' %}
+{% block terceiroNivel %}<li><a href="http://localhost:8000/cadastros/{{ nomeTela }}/detalhes/">{{ nomeTela }}</a></li>  {% endblock %}
+
+{% block javascript %}
+	
+	$("#ButtonModal3").hide();
+
+	$('.excluir').click(
+		function(){
+				var id = $(this).attr('id')
+				$('#botaoSim').attr("href",id);
+			}
+	);
+
+	$('#botaoOK3 ').click(
+			function(){
+				$(location).attr('href','http://localhost:8000/cadastros/{{ nomeTela }}/detalhes/');
+			}
+		);
+		
+	{% if msgErro %}
+		$('#ButtonModal3').trigger("click");
+	{% endif %}
+
+	{% ifequal deletar "deletar" %}
+		$(location).attr('href','http://localhost:8000/cadastros/{{ nomeTela }}/detalhes/');
+	{% endifequal %}
+
+	{% ifequal editar "editar" %}
+		$(location).attr('href','http://localhost:8000/cadastros/{{ nomeTela }}/detalhes/');
+	{% endifequal %}
+
+	$('.opcoesFiltro').click(
+		function(){
+			chave = $(this).attr('id');
+			valorFiltro = $('#filtro').val();
+			valorFiltro = String(valorFiltro);
+			if (valorFiltro == "" && chave != "todos") {
+				alert("Digite um valor para filtrar!")
+			}else{
+				if (chave == "todos"){
+					valorFiltro = 0;
+				}
+				href = String(($(this).attr('href')));
+				href = href + valorFiltro ;
+				href = href + "/";
+				url = 'http://localhost:8000/cadastros/{{ nomeTela }}/detalhes/filtrar/'+ chave +"/"+ valorFiltro+"/";
+				$(location).attr('href',url);
+			}
+		}
+	);
+
+{% endblock %}
+
+
+{% block content %}
+
+{# Filtros #}
+
+<div class="col-xs-1">
+</div>
+<div class="col-xs-2">
+	<a href="novo/"><button type="button" class="btn btn-success" ><i class="glyphicon glyphicon-plus"></i>  Novo </button></a>
+</div>
+<div class="col-xs-4">
+</div>	
+</div>
+<div class="col-xs-4">
+	<strong>Filtro</strong>
+    <div class="input-group">
+  	<input type="text" class="form-control" id="filtro" name="filtro">
+  	<div class="input-group-btn">
+    	<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+        		<i class="glyphicon glyphicon-filter"></i>
+        		<span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+        	{# Cidade #}
+
+			{% if nomeTela == "Cidade" %}
+				<li><a class="opcoesFiltro" href="#" id="descricao">Nome</a></li>
+				<li><a class="opcoesFiltro" href="#" id="uf">UF</a></li>
+				<li><a class="opcoesFiltro" href="#" id="todos">Listar todos</a></li>	
+			{% endif %}
+
+			{# TipoEvento #}
+
+			{% if nomeTela == "TipoEvento" %}
+				<li><a class="opcoesFiltro" href="#" id="descricao">Nome</a></li>
+				<li><a class="opcoesFiltro" href="#" id="todos">Listar todos</a></li>	
+			{% endif %}
+
+			{# Cor #}
+
+			{% if nomeTela == "Cor" %}
+				<li><a class="opcoesFiltro" href="#" id="descricao">Nome</a></li>
+				<li><a class="opcoesFiltro" href="#" id="todos">Listar todos</a></li>	
+			{% endif %}
+
+			{# ObjetosEvento #}
+
+			{% if nomeTela == "ObjetosEvento" %}
+				<li><a class="opcoesFiltro" href="#" id="descricao">Nome</a></li>
+				<li><a class="opcoesFiltro" href="#" id="todos">Listar todos</a></li>	
+			{% endif %}
+
+			{# Bairro #}
+
+			{% if nomeTela == "Bairro" %}
+				<li><a class="opcoesFiltro" href="#" id="descricao">Nome</a></li>
+				<li><a class="opcoesFiltro" href="#" id="cidade">Cidade</a></li>
+				<li><a class="opcoesFiltro" href="#" id="todos">Listar todos</a></li>	
+			{% endif %}
+        </ul>
+  	</div>
+</div>
+</div>
+
+<br/><br/><br/><br/><br/><br/>
+<div class="container">
+
+{% if listItem %}
+<table class="table table-bordered table-hover table-condensed">
+	
+	{# Cidade #}
+
+	{% if nomeTela == "Cidade" %}
+
+    		<thead>
+    			<th>ID</th>
+    			<th>Nome</th>
+    			<th>Estado</th>
+    			<th>Editar?</th>
+    			<th>Excluir?</th>
+    		</thead>
+    	<tbody>
+    	{% for item in listItem %}
+			<tr>
+				<td id="{{ item.id }}">{{ item.id }}</td>
+				<td>{{ item.descricao }}</td>
+				<td>{{ item.estado }}</td>
+				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td> 
+				<td><a id="deletar/{{ item.id }}/" role="button" href="#confirmarExclusao" class="btn btn-danger excluir" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i></a></td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	{% endif %}
+
+
+
+	{# Tipo de Evento #}
+
+	{% if nomeTela == "TipoEvento" or nomeTela == "ObjetosEvento" or nomeTela == "Cor" %}
+    		<thead>
+    			<th>ID</th>
+    			<th>Nome</th>
+    			<th>Editar?</th>
+    			<th>Excluir?</th>
+    		</thead>
+    	<tbody>
+    	{% for item in listItem %}
+			<tr>
+				<td>{{ item.id }}</td>
+				<td>{{ item.descricao }}</td>
+				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td>
+				<td><a id="deletar/{{ item.id }}/" role="button" href="#confirmarExclusao" class="btn btn-danger excluir" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i></a></td>
+			</tr>
+		</tbody>
+		{% endfor %}
+			</tbody>
+	{% endif %}
+
+	{# Bairro #}
+
+	{% if nomeTela == "Bairro" %}
+    		<thead>
+    			<th>ID</th>
+    			<th>Nome</th>
+    			<th>Cidade</th>
+    			<th>Editar?</th>
+    			<th>Excluir?</th>
+    		</thead>
+    	<tbody>
+    	{% for item in listItem %}
+			<tr>
+				<td id="{{ item.id }}">{{ item.id }}</td>
+				<td>{{ item.descricao }}</td>
+				<td>{{ item.cidade }}</td>
+				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td> 
+				<td><a id="deletar/{{ item.id }}/" role="button" href="#confirmarExclusao" class="btn btn-danger excluir" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i></a></td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	{% endif %}
+
+	
+	{# Cliente #}
+
+	{% ifequal nomeTela "Cliente" %}
+    		<thead>
+				<th>ID</th>
+				<th>Nome</th>
+				<th>logradouro</th>
+				<th>Número</th>
+				<th>Cidade</th>
+				<th>UF</th>
+				<th>E-mail</th>
+				<th>RG</th>
+				<th>CPF</th>
+				<th>Data de Nascimento</th>
+				<th>Como conheceu?</th>
+				<th>Contratou outro evento?</th>
+				<th>Editar?</th>
+				<th>Excluir?</th>
+			</thead>
+    	<tbody>
+    	{% for item in listItem %}
+			
+			<tr>
+				<td>{{ item.id }}</td>
+				<td>{{ item.nome }}</td>
+				<td>{{ item.logradouro }}</td>
+				<td>{{ item.numero }}</td>
+				<td>{{ item.cidade }}</td>
+				<td>{{ item.cidade.estado }}</td>
+				<td>{{ item.email }}</td>
+				<td>{{ item.RG }}</td>
+				<td>{{ item.CPF }}</td>
+				<td>{{ item.dataNascimento }}</td>
+				<td>{{ item.comoConheceu }}</td>
+				
+				{% ifequal item.eventoAnterior True %}
+					<td>Sim</td>
+				{% endifequal %}
+
+				{% ifequal item.eventoAnterior False %}
+					<td>Não</td>
+				{% endifequal %}
+				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td>
+				<td><a id="deletar/{{ item.id }}/" role="button" href="#confirmarExclusao" class="btn btn-danger excluir" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i></a></td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	{% endifequal %}	
+	
+	{# Evento #}
+
+	{% ifequal nomeTela "Evento" %}
+    		<thead>
+				<th>ID</th>
+				<th>Data</th>
+				<th>Tipo de evento</th>
+				<th>Cliente</th>
+				<th>Pagará a limpeza?</th>
+				<th>Valor total</th>
+				<th>Objetos</th>
+				<th>Hora de início</th>
+				<th>Hora de Término</th>
+				<th>Número de cobertas </th>
+				<th>Cor da coberta</th>
+				<th>Editar?</th>
+				<th>Excluir?</th>
+			</thead>
+    	{% for item in listItem %}
+			
+			<tr>
+				<td>{{ item.id }}</td>
+				<td>{{ item.data }}</td>
+				<td>{{ item.tipoEvento }}</td>
+				<td>{{ item.cliente }}</td>
+
+				{% ifequal item.pagaraLimpeza True %}
+					<td>Sim</td>
+				{% endifequal %}
+
+				{% ifequal item.pagaraLimpeza False %}
+					<td>Não</td>
+				{% endifequal %}
+
+				<td>{{ item.valorTotal }}</td>
+				<td>
+				{% for objeto in item.objetos.all %}
+					{{ objeto }}
+				{% endfor%} 
+				</td>
+				<td>{{ item.horaInicio }}</td>
+				<td>{{ item.horaTermino }}</td>
+				<td>{{ item.numCobertas }}</td>
+				<td>{{ item.corCoberta }}</td>
+				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td>
+				<td><a id="deletar/{{ item.id }}/" role="button" href="#confirmarExclusao" class="btn btn-danger excluir" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i></a></td>
+			</tr>
+		</tbody>
+		{% endfor %}
+		</tbody>
+	{% endifequal %}
+
+	{# Contato #}
+
+	{% ifequal nomeTela "Contato" %}
+    		<thead>
+    			<td>ID</td>
+    			<td>Contato</td>
+    			<td>Cliente</td>
+    			<td>Editar?</td>
+    			<td>Excluir?</td>
+    		</thead>
+    	<tbody>
+    	{% for item in listItem %}
+			
+			<tr>
+				<td>{{ item.id }}</td>
+				<td>{{ item.contato }}</td>
+				<td>{{ item.cliente }}</td>
+				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td>
+				<td><a id="deletar/{{ item.id }}/" role="button" href="#confirmarExclusao" class="btn btn-danger excluir" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i></a></td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	{% endifequal %}
+</table>
+{% else %}
+<p> Não existem dados cadastrados
+{% if acao == "filtrar" %}
+	para este filtro
+{% endif %}
+.</p>
+{% endif %}
+</div>
+
+
+<!-- modal -->
+
+<div class="modal fade" id="confirmarExclusao" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h2 class="modal-title" id="myModalLabel">Confirmação de exclusão</h2>
+	      </div>
+	      <div class="modal-body">
+	        <h4>Deseja realmente excluir o atual registro?</h4>
+	      </div>
+	      <div class="modal-footer">
+	        <a id="botaoSim" class="btn btn-primary" href="">Sim</a>
+	        <button class="btn" data-dismiss="modal" aria-hidden="true">Não</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+<div class="modal fade" id="msgErro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h2 class="modal-title" id="myModalLabel">Erro</h2>
+	      </div>
+	      <div class="modal-body">
+	        <h4>{{ msgErro }}</h4>
+	      </div>
+	      <div class="modal-footer">
+	      	<button id="botaoOK3" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">OK</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+
+<a id="ButtonModal3" href="#msgErro" role="button" class="btn" data-toggle="modal">Clique para mostrar o modal</a>
+{% endblock %}

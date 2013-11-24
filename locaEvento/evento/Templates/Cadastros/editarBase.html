@@ -1,0 +1,31 @@
+{% extends 'cadastros/novoBase.html' %}
+{% block quartoNivel %} <li><a href="http://localhost:8000/cadastros/{{ nomeTela }}/editar">Buscar</a></li>  {% endblock %}
+{% block quintoNivel %} <li><a href="http://localhost:8000/cadastros/{{ nomeTela }}/editar">Editar</a></li>  {% endblock %}
+	
+
+{% block head %}
+	<h1>Editar <small> 
+	{% ifequal nomeTela "TipoEvento" %}
+		Tipo de Evento
+	{% else %}
+		{% ifequal nomeTela "ObjetosEvento" %}
+			Objetos do Evento
+		{% else %}
+			{{ nomeTela }}
+		{% endifequal %}
+	{% endifequal %}
+	</small></h1>
+{% endblock %}
+
+
+{% block formHeader %}
+		action="salvarAlteracoes/"
+{% endblock %}
+
+
+{% block botoes %}
+		<div class="form-actions">
+  			<button type="submit" class="btn btn-primary btn-lg" ><i class="glyphicon glyphicon-plus-sign glyphicon-white"></i> Salvar Alterações</button>
+  			<a class="btn btn-danger btn-lg" href="http://localhost:8000/cadastros/{{ nomeTela }}/buscar/"><i class="glyphicon glyphicon-remove-sign glyphicon-white"></i> Cancelar</a>
+  		</div>
+ {% endblock %}
