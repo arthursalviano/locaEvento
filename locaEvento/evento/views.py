@@ -5,8 +5,9 @@ import os, sys
 from django import http
 from locaEvento.evento.models import *
 from django.template.loader import get_template
-#from locaEvento.evento.forms import *
+from django.template import RequestContext, Context
 from django.http import HttpResponse
+from django.core import serializers
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 #from reportlab.pdfgen import canvas
@@ -217,17 +218,14 @@ def recuperarItens(nomeTabela):
 
 	return obj
 
-def pesquisar(request,valor):
-	tabela = definirTabela(request.path)
-	bairros = ""
-	if tabela == 'Cliente':
-		cidades = Cidade.objects.all()
-		bairros = Bairro.objects.filter(cidade__id=valor)
+def mudarCidade(request,valor):
+	bairros = Bairro.objects.filter(cidade__id=valor)
+	retorno = serializers.serialize("json",bairros)
+	return HttpResponse(retorno,mimetype="text/javascript")
+	#if tabela == 'Cliente':
+		#cidades = Cidade.objects.all()
+		#bairros = Bairro.objects.filter(cidade__id=valor)
 
-	return render(request,'Cadastros/novoBase.html',{'nomeTela':tabela,
-													 'bairros':bairros,
-													 'cidades':cidades,	
-													  })
 	"""
 	elif nomeTabela == 'Evento':
 		obj = Evento.objects.all()
@@ -303,7 +301,8 @@ def montarObjetoSalvar(nomeTabela,post):
 		nome           = post['nome']
 		logradouro     = post['logradouro']
 		numero         = post['numero']
-		cidade         = Cidade.objects.get(id=post['cidade']) 
+		cidade         = Cidade.objects.get(id=post['clienteCidade'])
+		bairro         = Bairro.objects.get(id=post['clienteBairro']) 
 		email          = post['email']
 		RG             = post['RG']
 		CPF            = post['CPF']
@@ -315,7 +314,7 @@ def montarObjetoSalvar(nomeTabela,post):
 		else:
 			eventoAnterior = False
 		
-		obj = Cliente(nome=nome,logradouro=logradouro,numero=numero,cidade=cidade,email=email,RG=RG,CPF=CPF,dataNascimento=dataNascimento,comoConheceu=comoConheceu,eventoAnterior=eventoAnterior)
+		obj = Cliente(nome=nome,logradouro=logradouro,numero=numero,cidade=cidade,bairro=bairro,email=email,RG=RG,CPF=CPF,dataNascimento=dataNascimento,comoConheceu=comoConheceu,eventoAnterior=eventoAnterior)
 	elif nomeTabela == 'Cor':
 		descricao      = post['descricao']
 		obj            = Cor(descricao=descricao)

@@ -56,10 +56,24 @@
 			
 		{% endifequal %}
 
-
+		{# Atualização automática do combo de bairros #}
 		$( "#clienteCidade" ).change(function() {
-				var path = "http://localhost:8000/cadastros/{{ nomeTela }}/pesquisar/"+ $('#clienteCidade').val()+"/";
-  				$(location).attr('href',path)
+				idCidade = $("#clienteCidade").val();
+				url = "/mudarCidade/"+idCidade+"/";
+
+				$.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                success: function(retorno){
+                    $("#clienteBairro").empty();
+                    $.each(retorno, function(i, item){
+                    	html = "<option value='"+ item['pk'] +"'>"+item.fields['descricao'] +"</option>";
+                        $("#clienteBairro").append(html);
+                    });
+                    $("#clienteBairro").show();
+                }
+            });
 		});
 		
 	
@@ -286,9 +300,6 @@
 					<div class="col-xs-3">
 						<label for="clienteBairro">Bairro</label>
 				    	<select class="form-control" id="clienteBairro" name="clienteBairro" required>
-		  				{% for bairro in bairros %}
-		  					<option value="{{ bairro.id }}">{{ bairro.descricao }}</option>
-		  				{% endfor %}
 						</select>
 					</div>
 				</div>

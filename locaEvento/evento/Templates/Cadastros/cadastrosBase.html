@@ -1,4 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block javascript %}
+  $('img').attr('width',50);
+  $('img').attr('height',50);
+  //$('h3').css('color',"black");
+{% endblock %}
 
 {% block segundoNivel %} 
 <li><a href="http://localhost:8000/cadastros/">Cadastros</a></li> 
@@ -10,39 +17,52 @@
 
 {% block content %}
 <div class="container">
-	<div class="panel panel-primary">
-  		<div class="panel-heading">
-    		<h1 class="panel-title"><strong>Cadastros Auxiliares</strong></h1>
-  		</div>
-  		<div class="panel-body">
-    		<div class="btn-group">
+    		<div class="btn-group ">
   				<ul class="nav nav-justified">
-  					<li><a href="Cidade/detalhes/"><h3>Cidade</h3></a></li>
-  					<li><a href="TipoEvento/detalhes/"><h3>Tipo de Evento</h3></a></li>
-  					<li><a href="Cor/detalhes/"><h3>Cor</h3></a></li>
-  					<li><a href="ObjetosEvento/detalhes/"><h3>Objetos do evento</h3></a></li>
-            <li><a href="Bairro/detalhes/"><h3>Bairro</h3></a></li>
+            <li>
+              <a href="Cidade/detalhes/" type="button" class="btn ">
+                <img  src="{% static 'Bootstrap/img/city.png' %}" alt="Cidade"/>
+                <h3>Cidade</h3>
+              </a>
+            </li>
+            <li>
+              <a href="TipoEvento/detalhes/" type="button" class="btn">
+                <img  src="{% static 'Bootstrap/img/EventType.png' %}" alt="Tipo de Evento"/>
+                <h3>Tipo de evento</h3>
+              </a>
+            </li>
+            <li>
+              <a href="Cor/detalhes/" type="button" class="btn">
+                <img  src="{% static 'Bootstrap/img/color.png' %}" alt="Cor"/>
+                <h3>Cor</h3>
+              </a>
+            </li>
 				</ul>
+        <ul class="nav nav-justified">
+            <li>
+              <a href="ObjetosEvento/detalhes/" type="button" class="btn">
+                <img  src="{% static 'Bootstrap/img/stereo.png' %}" alt="Objetos do Evento"/>
+                <h3>Objetos do evento</h3>
+              </a>
+            </li> 
+            <li>
+              <a href="Bairro/detalhes/" type="button" class="btn">
+                <img  src="{% static 'Bootstrap/img/district.png' %}" alt="Bairro"/>
+                <h3>Bairro</h3>
+              </a>
+            </li>
+            <li>
+              <a href="Cliente/detalhes/" type="button" class="btn">
+                <img  src="{% static 'Bootstrap/img/client.png' %}" alt="Bairro"/>
+                <h3>Cliente</h3>
+              </a>
+            </li> 
+        </ul>
 			</div>
-  		</div>
 	</div>
-
-	<div class="panel panel-primary">
-  		<div class="panel-heading">
-    		<h1 class="panel-title"><strong>Cadastros Principais</strong></h1>
-  		</div>
-  		<div class="panel-body">
-    		<div class="btn-group">
-    			<ul class="nav nav-justified">
-  					<li><a href="Cliente/detalhes/"><h3>Cliente</h3></a></li>
-  					<li><a href="Contato/detalhes/"><h3>Contato</h3></a></li>
-  					<li><a href="Evento/detalhes/"><h3>Evento</h3></a></li>
-				</ul>
-			</div>
-  		</div>
-	</div>
-
 </div>
 {% endblock %}
 
+<li><a href="Contato/detalhes/"><h3>Contato</h3></a></li>
+<li><a href="Evento/detalhes/"><h3>Evento</h3></a></li>
 

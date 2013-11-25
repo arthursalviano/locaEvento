@@ -17,7 +17,7 @@ urlpatterns = patterns('',
     
 
     url(r'filtrar/(.+)/(.+)/$',filtrar),
-    url(r'pesquisar/(.+)/$',pesquisar),
+    url(r'mudarCidade/(.+)/$',mudarCidade),
 
     #### Acesso direto a metodos
    #url(r'pesquisar/(+w)/(+w)/$',pesquisar),
