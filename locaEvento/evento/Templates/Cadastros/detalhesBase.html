@@ -200,11 +200,14 @@
     		<thead>
 				<th>ID</th>
 				<th>Nome</th>
+				<!--
 				<th>logradouro</th>
 				<th>Número</th>
 				<th>Cidade</th>
 				<th>UF</th>
+				-->
 				<th>E-mail</th>
+				<th>Contato</th>
 				<th>RG</th>
 				<th>CPF</th>
 				<th>Data de Nascimento</th>
@@ -217,23 +220,26 @@
     	{% for item in listItem %}
 			
 			<tr>
-				<td>{{ item.id }}</td>
-				<td>{{ item.nome }}</td>
-				<td>{{ item.logradouro }}</td>
-				<td>{{ item.numero }}</td>
-				<td>{{ item.cidade }}</td>
-				<td>{{ item.cidade.estado }}</td>
-				<td>{{ item.email }}</td>
-				<td>{{ item.RG }}</td>
-				<td>{{ item.CPF }}</td>
-				<td>{{ item.dataNascimento }}</td>
-				<td>{{ item.comoConheceu }}</td>
-				
-				{% ifequal item.eventoAnterior True %}
+				<td>{{ listItem.cliente.id }}</td>
+				<td>{{ item.cliente.nome }}</td>
+				<!--
+				<td>{{ item.cliente.logradouro }}</td>
+				<td>{{ item.cliente.numero }}</td>
+				<td>{{ item.cliente.cidade }}</td>
+				<td>{{ item.cliente.cidade.estado }}</td>
+				-->
+				<td>{{ item.cliente.email }}</td>
+				<td> {{ item.contato }} </td>
+				<td>{{ item.cliente.RG }}</td>
+				<td>{{ item.cliente.CPF }}</td>
+				<td>{{ item.cliente.dataNascimento }}</td>
+				<td>{{ item.cliente.comoConheceu }}</td>
+
+				{% ifequal item.cliente.eventoAnterior True %}
 					<td>Sim</td>
 				{% endifequal %}
 
-				{% ifequal item.eventoAnterior False %}
+				{% ifequal item.cliente.eventoAnterior False %}
 					<td>Não</td>
 				{% endifequal %}
 				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td>

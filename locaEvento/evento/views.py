@@ -111,6 +111,7 @@ def pgSalvar(request):
 	if request.POST:
 		tabela = definirTabela(request.path)
 		#try:
+		url = 'Cadastros/novoBase.html'
 		obj = montarObjetoSalvar(tabela,request.POST)
 		obj.save()
 		if request.POST.has_key('objetos'):
@@ -118,11 +119,9 @@ def pgSalvar(request):
 			for objeto in objetos:	
 				obj.objetos.add(objeto)
 		msg = "Salvo"
-		return render(request,'Cadastros/novoBase.html',{'nomeTela':tabela, 'msg':msg})
 		#except:
 		#return HttpResponse("Erro ao salvar arquivo ")	
-	else:
-		return render(request,'Cadastros/novoBase.html',{'nomeTela':tabela, 'msg':msg})
+		return render(request,url,{'nomeTela':tabela, 'msg':msg})
 
 def atualizar(request,pk):
 	if request.POST:
@@ -191,7 +190,9 @@ def pgEditar(request,id):
 
 def pgDetalhes(request):
 	tabela     = definirTabela(request.path)
-	resultSet  = recuperarItens(tabela) 	
+	resultSet  = recuperarItens(tabela)
+	if tabela == 'Cliente':
+		resultSet = Contato.objects.select_related().all()
 	return render(request,'Cadastros/detalhesBase.html',{'nomeTela':tabela, 'listItem':resultSet})
 
 ##############################################
@@ -315,6 +316,10 @@ def montarObjetoSalvar(nomeTabela,post):
 			eventoAnterior = False
 		
 		obj = Cliente(nome=nome,logradouro=logradouro,numero=numero,cidade=cidade,bairro=bairro,email=email,RG=RG,CPF=CPF,dataNascimento=dataNascimento,comoConheceu=comoConheceu,eventoAnterior=eventoAnterior)
+	elif nomeTabela == 'Contato':
+		contato        = post['contato']
+		cliente        = Cliente.objects.get(id=post['cliente'])
+		obj            = Contato(contato=contato,cliente=cliente)
 	elif nomeTabela == 'Cor':
 		descricao      = post['descricao']
 		obj            = Cor(descricao=descricao)
@@ -334,10 +339,6 @@ def montarObjetoSalvar(nomeTabela,post):
 		numCobertas    = post['numCobertas']
 		corCoberta     = Cor.objects.get(id=post['corCoberta'])	
 		obj            = Evento(data=data,tipoEvento=tipoEvento,cliente=cliente,pagaraLimpeza=pagaraLimpeza,valorTotal=valorTotal,horaInicio=horaInicio,horaTermino=horaTermino,numCobertas=numCobertas,corCoberta=corCoberta)
-	elif nomeTabela == 'Contato':
-		contato        = post['contato'] 
-		cliente        = Cliente.objects.get(id=post['cliente'])
-		obj            = Contato(contato=contato,cliente=cliente)
 	elif nomeTabela == 'ObjetosEvento':
 		descricao      = post['descricao']
 		obj            = ObjetosEvento(descricao=descricao)

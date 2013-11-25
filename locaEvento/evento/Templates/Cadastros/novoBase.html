@@ -48,6 +48,21 @@
 			}
 		);
 
+		$('#addContato').click(
+			function(){
+				contato = $('#contato').val();
+				if (contato == undefined || contato == ""){
+					alert('Adicione um contato para adicionar');
+				}else{
+					$('#labelContatos').append("<li><a><h4>"+contato+"</h4></a></li>");
+					html= '<input type="text" display="none" class="form-control contatos" name="contatos" placeholder="contatos" required value="'+contato+'">';
+					$('#contato').val("");
+					$('#contatos').append(html);
+					//$('.contatos').hide();
+				}
+			}
+		);
+
 		{# aqui são setados os combos em caso de edição #}
 
 		{% ifequal editar "editar" %}
@@ -76,7 +91,6 @@
             });
 		});
 		
-	
 {% endblock %}
 
 
@@ -403,6 +417,32 @@
 	<!-- Formulário Contato -->
 
 	{% ifequal nomeTela "Contato" %}
+		<!--
+		<div class="form-group">
+			<div class="panel panel-primary">
+		  		<div class="panel-heading">
+		    		<h1 class="panel-title"><strong>CONTATOS</strong></h1>
+		  		</div>
+		  		<div class="panel-body">
+		    		<div class="form-group">
+			    		<div class="col-xs-4" id="contatos">
+			    			<label class="control-label" for="contato" >Contato</label>
+					    	<input type="text" class="form-control" id="contato"  placeholder="contato">
+			    		</div>
+			    		<div class="col-xs-3">
+			    			<br>
+					    	<a class="btn btn-success btn-lg" id="addContato"><i class="glyphicon glyphicon-plus-sign glyphicon-white"></i> Adicionar contatos</a>
+						</div>
+						<div class="col-xs-3">
+			    			<ul class="nav nav-list" id="labelContatos">
+			    				<li class="nav-header" ><h3>Contatos adicionados:</h3></li>
+					    	</ul>
+						</div>
+					</div>
+		  		</div>
+	  		</div>
+	  	</div>
+		-->
 		<div class="form-group">
 		    <label for="contato" >Contato</label>
 		    <input type="text" class="form-control" id="contato" name="contato" placeholder="Contato" required>
