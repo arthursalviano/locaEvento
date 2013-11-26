@@ -3,16 +3,17 @@
 {% block javascript %}
 		
 		{# outros efeitos #}
-
+		
 		$("#ButtonModal").hide();
 		$("#ButtonModal2").hide();
-		
+			
 		{# máscaras #}
 
-		$("#contato").mask("(99) 9999-9999");
+		$(".contato").mask("(99)9999-9999");
 		$("#RG").mask("999.999.999");
 		$("#CPF").mask("999.999.999-99");
 		$("#valorTotal").mask("9.999,99");
+
 
 		{# o botão que ativa a mensagem de salvo com sucesso é ativado aqui. #}
 		
@@ -23,16 +24,21 @@
 
 		{# o botão que ativa o modal para redirecionar os cadastros necessários é feita aqui#}
 
-		{% if msg != "Salvo" %}
+		{% if msg == "Novo" %}
 			{% if nomeTela == "Bairro" %} 
 	        	{% if not cidades %}
+	        		$('#ButtonModal2').trigger("click");
+	        	{% endif %}
+	    	{% endif %}
+	    	{% if nomeTela == "Cliente" %} 
+	        	{% if not bairros %}
 	        		$('#ButtonModal2').trigger("click");
 	        	{% endif %}
 	    	{% endif %}
 	    {% endif %}
 	        
 
-	    {# comportamento dos botões modais (Salvo com sucesso e redirecionamento de cadastros necessários) #}
+	    {# comportamento dos botões modais (Salvo com sucesso e redirecionamento de cadastros necessários)#}
 
 		$('#botaoOk').click(
 			function(){
@@ -40,38 +46,26 @@
 			}
 		);
 
+		 
 		$('#botaoOk2').click(
 			function(){
-				{% if nomeTela == 'Bairro' %} 
-					$(location).attr('href','http://localhost:8000/cadastros/Cidade/novo/');
+				url = "http://localhost:8000/cadastros/";
+				{% if nomeTela == 'Bairro' %}
+					url = url + "Cidade";
+				{% else %}
+					{% if nomeTela == 'Cliente' %}
+						url = url + "Bairro";
+					{% endif %}
 				{% endif %}
+				url = url + "/novo/";
+				$(location).attr('href',url);
 			}
 		);
 
-		$('#addContato').click(
-			function(){
-				contato = $('#contato').val();
-				if (contato == undefined || contato == ""){
-					alert('Adicione um contato para adicionar');
-				}else{
-					$('#labelContatos').append("<li><a><h4>"+contato+"</h4></a></li>");
-					html= '<input type="text" display="none" class="form-control contatos" name="contatos" placeholder="contatos" required value="'+contato+'">';
-					$('#contato').val("");
-					$('#contatos').append(html);
-					//$('.contatos').hide();
-				}
-			}
-		);
-
-		{# aqui são setados os combos em caso de edição #}
-
-		{% ifequal editar "editar" %}
-			$('#UF').val("{{ obj.estado }}");
-			$('#bairroCidade').val("{{ obj.cidade.id }}");
-			
-		{% endifequal %}
-
+		
 		{# Atualização automática do combo de bairros #}
+		{% if nomeTela == 'Cliente' %}
+		
 		$( "#clienteCidade" ).change(function() {
 				idCidade = $("#clienteCidade").val();
 				url = "/mudarCidade/"+idCidade+"/";
@@ -82,14 +76,37 @@
                 dataType: "json",
                 success: function(retorno){
                     $("#clienteBairro").empty();
+                    $("#clienteBairro").append('<option>Escolha um bairro</option>');
                     $.each(retorno, function(i, item){
-                    	html = "<option value='"+ item['pk'] +"'>"+item.fields['descricao'] +"</option>";
+                    	html = "<option value='" + item["pk"] + "'"; 
+                    	
+                    	{% if editar == "editar" %}
+                    	if(item['pk'] == {{ obj.bairro.id }}){
+                    		html = html + " selected " ;
+                    	}
+                    	{% endif %}
+                    	html = html + ">" + item.fields['descricao'] +"</option>";
                         $("#clienteBairro").append(html);
                     });
                     $("#clienteBairro").show();
                 }
             });
 		});
+		{% endif %}
+
+
+		{# aqui são setados os combos em caso de edição #}
+
+		{% ifequal editar "editar" %}
+			$('#UF').val("{{ obj.estado }}");
+			$('#bairroCidade').val("{{ obj.cidade.id }}");
+			$('#eventoAnterior').val("{{ obj.eventoAnterior }}");
+			
+			$('#clienteCidade').val("{{ obj.cidade.id }}");
+			$('#clienteCidade').trigger("change");
+		{% endifequal %}
+
+		
 		
 {% endblock %}
 
@@ -142,6 +159,7 @@
 			    <div class="col-xs-4">
 					<label for="bairroCidade">Cidade</label>
 				    <select class="form-control" id="bairroCidade" name="bairroCidade" required>
+		  				<option value="">Escolha uma cidade</option>
 		  				{% for cidade in cidades %}
 		  					<option value="{{ cidade.id }}">{{ cidade.descricao }}</option>
 		  				{% endfor %}
@@ -188,7 +206,7 @@
 					<option value="PE">PERNAMBUCO</option>
 					<option value="PI">PIAUÍ</option>
 					<option value="RJ">RIO DE JANEIRO</option>
-					<option value="RN" >RIO GRANDE DO NORTE</option>
+					<option value="RN" selected>RIO GRANDE DO NORTE</option>
 					<option value="RS">RIO GRANDE DO SUL</option>
 					<option value="RO">RONDÔNIA</option>
 					<option value="RR">RORAIMA</option>
@@ -262,25 +280,45 @@
 		  		<div class="panel-body">
 				    <div class="col-xs-6">
 				    	<label class="control-label" for="nome" >Nome</label>
-		    			<input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" required>
+		    			<input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" 
+		    			{% ifequal editar "editar" %}
+		    				value="{{ obj.nome }}"
+		    			{% endifequal %}
+		    			required>
+		    			
 		  			</div>
 		  			<div class="col-xs-3">
 				    	<label class="control-label" for="CPF" >CPF</label>
-				    	<input type="text" class="form-control" id="CPF" name="CPF" placeholder="CPF" required>
+				    	<input type="text" class="form-control" id="CPF" name="CPF" placeholder="CPF" 
+				    	{% ifequal editar "editar" %}
+		    				value="{{ obj.CPF }}"
+		    			{% endifequal %}
+				    	required>
 		  			</div>
 		  			<div class="col-xs-3">
 				    	<label class="control-label" for="RG" >RG</label>
-				    	<input type="text" class="form-control" id="RG" name="RG" placeholder="RG" required>
+				    	<input type="text" class="form-control" id="RG" name="RG" placeholder="RG" 
+				    	{% ifequal editar "editar" %}
+		    				value="{{ obj.RG }}"
+		    			{% endifequal %}
+				    	required>
 		  			</div>
 		  		</div>
 		  		<div class="panel-body">
 				    <div class="col-xs-5">
 				    	<label class="control-label" for="email" >E-mail</label>
-		    			<input type="email" class="form-control" id="email" name="email" placeholder="email" required>
+		    			<input type="email" class="form-control" id="email" name="email" placeholder="email"{% ifequal editar "editar" %}
+		    				value="{{ obj.email }}"
+		    			{% endifequal %} 
+		    			required>
 		  			</div>
-		  			<div class="col-xs-2">
+		  			<div class="col-xs-3">
 				    	<label class="control-label" for="date" >Data de nascimento</label>
-		    			<input type="date" class="form-control" id="dataNascimento" name="dataNascimento" placeholder="Data de Nascimento" required>
+		    			<input type="date" class="form-control" id="dataNascimento" name="dataNascimento" placeholder="Data de Nascimento"
+		    			{% ifequal editar "editar" %}
+		    				value="{{ obj.dataNascimento|date:"Y-m-d" }}"
+		    			{% endifequal %}
+		    			required>
 		  			</div>
 		  		</div>
 			</div>
@@ -294,11 +332,19 @@
 		    		<div class="form-group">
 		    		<div class="col-xs-6">
 				    	<label class="control-label" for="logradouro" >Logradouro</label>
-				    	<input type="text" class="form-control" id="logradouro" name="logradouro" placeholder="Logradouro" required>
+				    	<input type="text" class="form-control" id="logradouro" name="logradouro" placeholder="Logradouro" 
+				    	{% ifequal editar "editar" %}
+		    				value="{{ obj.logradouro }}"
+		    			{% endifequal %}
+				    	required>
 					</div>
 					<div class="col-xs-2">
 				    	<label for="numero" >Número</label>
-				    	<input type="text" class="form-control" id="numero" name="numero" placeholder="Número" required>
+				    	<input type="text" class="form-control" id="numero" name="numero" placeholder"Número" 
+				    	{% ifequal editar "editar" %}
+		    				value="{{ obj.numero }}"
+		    			{% endifequal %}	
+				    	required>
 					</div>
 					
 				</div>
@@ -306,6 +352,7 @@
 					<div class="col-xs-3">
 						<label for="clienteCidade">Cidade</label>
 				    	<select class="form-control" id="clienteCidade" name="clienteCidade" required>
+		  				<option value="">Escolha uma cidade</option>
 		  				{% for cidade in cidades %}
 		  					<option value="{{ cidade.id }}">{{ cidade.descricao }}</option>
 		  				{% endfor %}
@@ -321,9 +368,57 @@
 		  	</div>
 	  	</div>
 	  	<div class="form-group">
+			<div class="panel panel-primary">
+		  		<div class="panel-heading">
+		    		<h1 class="panel-title"><strong>CONTATOS</strong></h1>
+
+		  		</div>
+		  		<div class="panel-body">
+		    		<div class="form-group">
+			    		<div class="col-xs-3">
+					    	<label class="control-label" for="contato01" >Contato 01</label>
+					    	<input type="text" class="form-control contato" id="contato01" name="contato01" placeholder="contato01" 
+					    	{% ifequal editar "editar" %}
+		    					value="{{ obj.contato01 }}"
+		    				{% endifequal %}	
+					    	required>
+						</div>
+						<div class="col-xs-1">
+						</div>
+						<div class="col-xs-3">
+					    	<label for="contato02" >Contato 02</label>
+					    	<input type="text" class="form-control contato" id="contato02" name="contato02" placeholder="contato02"
+
+					    	{% ifequal editar "editar" %}
+		    					value="{{ obj.contato02 }}"
+		    				{% endifequal %}	
+
+					    	>
+						</div>
+						<div class="col-xs-1">
+						</div>
+						<div class="col-xs-3">
+					    	<label for="contato03" >Contato 03</label>
+					    	<input type="text" class="form-control contato" id="contato03" name="contato03" placeholder="contato03" 
+
+					    	{% ifequal editar "editar" %}
+		    					value="{{ obj.contato03 }}"
+		    				{% endifequal %}	
+					    	
+					    	>
+						</div>
+					</div>
+		  		</div>
+		  	</div>
+	  	</div>
+	  	<div class="form-group">
 			<div class="col-xs-4">
 			    <label for="comoConheceu" >Como conheceu?</label>
-			    <input type="text" class="form-control" id="comoConheceu" name="comoConheceu" placeholder="Como conheceu?" required>
+			    <input type="text" class="form-control" id="comoConheceu" name="comoConheceu" placeholder="Como conheceu?" 
+			    {% ifequal editar "editar" %}
+		    		value="{{ obj.comoConheceu }}"
+		    	{% endifequal %}	
+			    required>
 			</div>
 			<div class="col-xs-2">
 				<label for="eventoAnterior">Evento anterior?</label>
@@ -333,6 +428,7 @@
 				</select>
 			</div>
 		</div>
+
 	{% endifequal %}
 
 	<!-- Formulário Evento -->
@@ -413,55 +509,11 @@
 			</div>
 		</div>
 	{% endifequal %}
-
-	<!-- Formulário Contato -->
-
-	{% ifequal nomeTela "Contato" %}
-		<!--
-		<div class="form-group">
-			<div class="panel panel-primary">
-		  		<div class="panel-heading">
-		    		<h1 class="panel-title"><strong>CONTATOS</strong></h1>
-		  		</div>
-		  		<div class="panel-body">
-		    		<div class="form-group">
-			    		<div class="col-xs-4" id="contatos">
-			    			<label class="control-label" for="contato" >Contato</label>
-					    	<input type="text" class="form-control" id="contato"  placeholder="contato">
-			    		</div>
-			    		<div class="col-xs-3">
-			    			<br>
-					    	<a class="btn btn-success btn-lg" id="addContato"><i class="glyphicon glyphicon-plus-sign glyphicon-white"></i> Adicionar contatos</a>
-						</div>
-						<div class="col-xs-3">
-			    			<ul class="nav nav-list" id="labelContatos">
-			    				<li class="nav-header" ><h3>Contatos adicionados:</h3></li>
-					    	</ul>
-						</div>
-					</div>
-		  		</div>
-	  		</div>
-	  	</div>
-		-->
-		<div class="form-group">
-		    <label for="contato" >Contato</label>
-		    <input type="text" class="form-control" id="contato" name="contato" placeholder="Contato" required>
-		</div>
-
-		<div class="form-group">
-			<label for="cliente">Cliente</label>
-		    <select class="form-control" id="cliente" name="cliente" required>
-  				{% for cliente in clientes %}
-  					<option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-  				{% endfor %}
-			</select>
-		</div>
-	{% endifequal %}
 		
 		{% block botoes %}
 		<div class="form-actions">
   			<button type="submit" class="btn btn-primary btn-lg" ><i class="glyphicon glyphicon-plus-sign glyphicon-white"></i> Salvar</button>
-  			<a class="btn btn-danger btn-lg" href="http://localhost:8000/cadastros/{{ nomeTela }}/"><i class="glyphicon glyphicon-remove-sign glyphicon-white"></i> Cancelar</a>
+  			<a class="btn btn-danger btn-lg" href="http://localhost:8000/cadastros/{{ nomeTela }}/detalhes/"><i class="glyphicon glyphicon-remove-sign glyphicon-white"></i> Cancelar</a>
   		</div>
   		{% endblock %}
 		</form>
@@ -486,7 +538,7 @@
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 
-	<div class="modal fade" id="avisoTabelasNecessárias" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal fade" id="avisoTabelasNecessarias" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -498,6 +550,11 @@
 	        {% if nomeTela == "Bairro" %} 
 	        	{% if not cidades %}
 	        	Para cadastrar um Bairro é necessário primeiro cadastrar alguma cidade. Você será redirecionado para a tela de cadastro de Cidade.
+	        	{% endif %}
+	       {% endif %}
+	       {% if nomeTela == "Cliente" %} 
+	        	{% if not bairros %}
+	        	Para cadastrar um Cliente é necessário primeiro cadastrar algum Bairro. Você será redirecionado para a tela de cadastro de Bairro.
 	        	{% endif %}
 	       {% endif %}
 	       </h4>
@@ -512,7 +569,7 @@
 
 
 <a id="ButtonModal" href="#salvoComSucesso" role="button" class="btn" data-toggle="modal">Clique para mostrar o modal</a>
-<a id="ButtonModal2"  href="#avisoTabelasNecessárias" role="button" class="btn" data-toggle="modal">Clique para mostrar o modal</a>
+<a id="ButtonModal2"  href="#avisoTabelasNecessarias" role="button" class="btn" data-toggle="modal">Clique para mostrar o modal</a>
 
 </div>
 {% endblock %}

@@ -26,16 +26,19 @@ class Bairro(models.Model):
 
 class Cliente(models.Model):
 	nome           = models.CharField(max_length=100)
+	email          = models.EmailField()
+	dataNascimento = models.DateField()
+	RG             = models.CharField(max_length=15)
+	CPF            = models.CharField(max_length=11)
 	logradouro     = models.CharField(max_length=200)
 	numero         = models.CharField(max_length=10)
 	cidade         = models.ForeignKey(Cidade,on_delete=models.PROTECT)
-	bairro 		   = models.ForeignKey(Bairro,on_delete=models.PROTECT) 
-	email          = models.EmailField()
-	RG             = models.CharField(max_length=15)
-	CPF            = models.CharField(max_length=11)
-	dataNascimento = models.DateField()
+	bairro 		   = models.ForeignKey(Bairro,on_delete=models.PROTECT)
+	contato01      = models.CharField(max_length=15)
+	contato02      = models.CharField(max_length=15,blank=True,null=True)
+	contato03      = models.CharField(max_length=15,blank=True,null=True) 
 	comoConheceu   = models.CharField(max_length=30)
-	eventoAnterior = models.BooleanField()
+	eventoAnterior = models.CharField(blank=True,null=True,max_length=5)
 
 	def __unicode__(self):
 		return self.nome
@@ -52,17 +55,6 @@ class ObjetosEvento(models.Model):
 
 	class Meta:
 		ordering =['descricao']
-
-# Tabela Contato
-class Contato(models.Model):
-	contato = models.CharField(max_length=15)
-	cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
-
-	def __unicode__(self):
-		return self.contato
-
-	class Meta:
-		ordering=['contato']
 
 #tabela Tipo de evento
 class TipoEvento(models.Model):

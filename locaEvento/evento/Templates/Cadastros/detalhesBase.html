@@ -111,6 +111,15 @@
 				<li><a class="opcoesFiltro" href="#" id="cidade">Cidade</a></li>
 				<li><a class="opcoesFiltro" href="#" id="todos">Listar todos</a></li>	
 			{% endif %}
+
+			{# Cliente #}
+
+			{% if nomeTela == "Cliente" %}
+				<li><a class="opcoesFiltro" href="#" id="nome">Nome</a></li>
+				<li><a class="opcoesFiltro" href="#" id="contatos">contato</a></li>
+				<li><a class="opcoesFiltro" href="#" id="CPF">CPF</a></li>
+				<li><a class="opcoesFiltro" href="#" id="todos">Listar todos</a></li>	
+			{% endif %}
         </ul>
   	</div>
 </div>
@@ -127,7 +136,6 @@
 	{% if nomeTela == "Cidade" %}
 
     		<thead>
-    			<th>ID</th>
     			<th>Nome</th>
     			<th>Estado</th>
     			<th>Editar?</th>
@@ -136,7 +144,6 @@
     	<tbody>
     	{% for item in listItem %}
 			<tr>
-				<td id="{{ item.id }}">{{ item.id }}</td>
 				<td>{{ item.descricao }}</td>
 				<td>{{ item.estado }}</td>
 				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td> 
@@ -152,7 +159,6 @@
 
 	{% if nomeTela == "TipoEvento" or nomeTela == "ObjetosEvento" or nomeTela == "Cor" %}
     		<thead>
-    			<th>ID</th>
     			<th>Nome</th>
     			<th>Editar?</th>
     			<th>Excluir?</th>
@@ -160,7 +166,6 @@
     	<tbody>
     	{% for item in listItem %}
 			<tr>
-				<td>{{ item.id }}</td>
 				<td>{{ item.descricao }}</td>
 				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td>
 				<td><a id="deletar/{{ item.id }}/" role="button" href="#confirmarExclusao" class="btn btn-danger excluir" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i></a></td>
@@ -174,7 +179,6 @@
 
 	{% if nomeTela == "Bairro" %}
     		<thead>
-    			<th>ID</th>
     			<th>Nome</th>
     			<th>Cidade</th>
     			<th>Editar?</th>
@@ -183,7 +187,6 @@
     	<tbody>
     	{% for item in listItem %}
 			<tr>
-				<td id="{{ item.id }}">{{ item.id }}</td>
 				<td>{{ item.descricao }}</td>
 				<td>{{ item.cidade }}</td>
 				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td> 
@@ -198,21 +201,9 @@
 
 	{% ifequal nomeTela "Cliente" %}
     		<thead>
-				<th>ID</th>
 				<th>Nome</th>
-				<!--
-				<th>logradouro</th>
-				<th>Número</th>
-				<th>Cidade</th>
-				<th>UF</th>
-				-->
-				<th>E-mail</th>
-				<th>Contato</th>
-				<th>RG</th>
+				<th>Contatos</th>
 				<th>CPF</th>
-				<th>Data de Nascimento</th>
-				<th>Como conheceu?</th>
-				<th>Contratou outro evento?</th>
 				<th>Editar?</th>
 				<th>Excluir?</th>
 			</thead>
@@ -220,28 +211,12 @@
     	{% for item in listItem %}
 			
 			<tr>
-				<td>{{ listItem.cliente.id }}</td>
-				<td>{{ item.cliente.nome }}</td>
-				<!--
-				<td>{{ item.cliente.logradouro }}</td>
-				<td>{{ item.cliente.numero }}</td>
-				<td>{{ item.cliente.cidade }}</td>
-				<td>{{ item.cliente.cidade.estado }}</td>
-				-->
-				<td>{{ item.cliente.email }}</td>
-				<td> {{ item.contato }} </td>
-				<td>{{ item.cliente.RG }}</td>
-				<td>{{ item.cliente.CPF }}</td>
-				<td>{{ item.cliente.dataNascimento }}</td>
-				<td>{{ item.cliente.comoConheceu }}</td>
-
-				{% ifequal item.cliente.eventoAnterior True %}
-					<td>Sim</td>
-				{% endifequal %}
-
-				{% ifequal item.cliente.eventoAnterior False %}
-					<td>Não</td>
-				{% endifequal %}
+				<td>{{ item.nome }}</td>
+				<td>{{ item.contato01 }}<br>
+					{{ item.contato02 }}<br>
+					{{ item.contato03 }}</td>
+				<td>{{ item.CPF }}</td>
+				
 				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td>
 				<td><a id="deletar/{{ item.id }}/" role="button" href="#confirmarExclusao" class="btn btn-danger excluir" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i></a></td>
 			</tr>
@@ -253,7 +228,6 @@
 
 	{% ifequal nomeTela "Evento" %}
     		<thead>
-				<th>ID</th>
 				<th>Data</th>
 				<th>Tipo de evento</th>
 				<th>Cliente</th>
@@ -268,9 +242,7 @@
 				<th>Excluir?</th>
 			</thead>
     	{% for item in listItem %}
-			
 			<tr>
-				<td>{{ item.id }}</td>
 				<td>{{ item.data }}</td>
 				<td>{{ item.tipoEvento }}</td>
 				<td>{{ item.cliente }}</td>
@@ -301,29 +273,6 @@
 		</tbody>
 	{% endifequal %}
 
-	{# Contato #}
-
-	{% ifequal nomeTela "Contato" %}
-    		<thead>
-    			<td>ID</td>
-    			<td>Contato</td>
-    			<td>Cliente</td>
-    			<td>Editar?</td>
-    			<td>Excluir?</td>
-    		</thead>
-    	<tbody>
-    	{% for item in listItem %}
-			
-			<tr>
-				<td>{{ item.id }}</td>
-				<td>{{ item.contato }}</td>
-				<td>{{ item.cliente }}</td>
-				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td>
-				<td><a id="deletar/{{ item.id }}/" role="button" href="#confirmarExclusao" class="btn btn-danger excluir" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i></a></td>
-			</tr>
-		</tbody>
-		{% endfor %}
-	{% endifequal %}
 </table>
 {% else %}
 <p> Não existem dados cadastrados

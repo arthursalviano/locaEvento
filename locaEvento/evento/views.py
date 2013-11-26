@@ -4,6 +4,7 @@ import os, sys
 
 from django import http
 from locaEvento.evento.models import *
+from django.db.models import Q
 from django.template.loader import get_template
 from django.template import RequestContext, Context
 from django.http import HttpResponse
@@ -84,9 +85,7 @@ def pgNovo(request):
 	cores = ""
 	bairros = ""
 
-	if tabela == "Contato":
-		clientes = Cliente.objects.all()
-	elif tabela == "Cliente" :
+	if tabela == "Cliente" :
 		cidades = Cidade.objects.all()
 		bairros = Bairro.objects.all()
 	elif tabela == "Bairro":
@@ -103,7 +102,8 @@ def pgNovo(request):
 													 'tiposEvento':tiposEvento,
 													 'objetosEvento': objetos,
 													 'cores': cores,
-													 'bairros':bairros	
+													 'bairros':bairros,
+													 'msg':'novo'	
 													  })
 
 def pgSalvar(request):
@@ -154,15 +154,12 @@ def pgEditar(request,id):
 	if request:
 		tabela = definirTabela(request.path)
 		obj = recuperarItemPorID(tabela,id)
-		
 		cidades  = ''
 		if tabela == "Bairro":
 			cidades  = Cidade.objects.all()
+		elif tabela == "Cliente" :
+			cidades  = Cidade.objects.all()
 		"""
-		if tabela == "Contato":
-			clientes = Cliente.objects.all()
-		elif tabela == "Cliente" or tabela == "Bairro" :
-			cidades = Cidade.objects.all()
 		elif tabela == "Evento":
 			tiposEvento = TipoEvento.objects.all()
 			clientes = Cliente.objects.all()
@@ -191,9 +188,9 @@ def pgEditar(request,id):
 def pgDetalhes(request):
 	tabela     = definirTabela(request.path)
 	resultSet  = recuperarItens(tabela)
-	if tabela == 'Cliente':
-		resultSet = Contato.objects.select_related().all()
-	return render(request,'Cadastros/detalhesBase.html',{'nomeTela':tabela, 'listItem':resultSet})
+
+	return render(request,'Cadastros/detalhesBase.html',{'nomeTela':tabela, 
+														 'listItem':resultSet})
 
 ##############################################
 ########### FUNÇÕES AUXILIARES ###############
@@ -208,8 +205,6 @@ def recuperarItens(nomeTabela):
 		obj = Cor.objects.all()
 	elif nomeTabela == 'Evento':
 		obj = Evento.objects.all()
-	elif nomeTabela == 'Contato':
-		obj = Contato.objects.all()
 	elif nomeTabela == 'ObjetosEvento':
 		obj = ObjetosEvento.objects.all()
 	elif nomeTabela == 'Cidade':
@@ -223,20 +218,6 @@ def mudarCidade(request,valor):
 	bairros = Bairro.objects.filter(cidade__id=valor)
 	retorno = serializers.serialize("json",bairros)
 	return HttpResponse(retorno,mimetype="text/javascript")
-	#if tabela == 'Cliente':
-		#cidades = Cidade.objects.all()
-		#bairros = Bairro.objects.filter(cidade__id=valor)
-
-	"""
-	elif nomeTabela == 'Evento':
-		obj = Evento.objects.all()
-	elif nomeTabela == 'Contato':
-		obj = Contato.objects.all()
-	elif nomeTabela == 'ObjetosEvento':
-		obj = ObjetosEvento.objects.all()
-	elif nomeTabela == 'Cidade':
-		obj = Cidade.objects.all()
-	"""
 	
 def filtrar(request,chave,valor):
 	tabela = definirTabela(request.path)
@@ -271,6 +252,16 @@ def filtrar(request,chave,valor):
 			resultSet  = Cor.objects.filter(descricao__contains=valor)
 		elif chave == 'todos':
 			resultSet = Cor.objects.all()
+	if tabela == 'Cliente':
+		if chave == 'nome':
+			resultSet  = Cliente.objects.filter(nome__contains=valor)
+		elif chave == 'contatos':
+			resultSet  = Cliente.objects.filter( Q(contato01__contains=valor)|Q(contato02__contains=valor)| Q(contato03__contains=valor))
+		elif chave == 'CPF':
+			resultSet  = Cliente.objects.filter(CPF__contains=valor)
+		elif chave == 'todos':
+			resultSet = Cliente.objects.all()
+		
 
 	return render(request,'Cadastros/detalhesBase.html',{'nomeTela':tabela, 'listItem':resultSet, 'acao': 'filtrar'}) 
 
@@ -283,8 +274,6 @@ def recuperarItemPorID(nomeTabela,pk):
 		obj = Cor.objects.get(id=pk)
 	elif nomeTabela == 'Evento':
 		obj = Evento.objects.get(id=pk)
-	elif nomeTabela == 'Contato':
-		obj = Contato.objects.get(id=pk)
 	elif nomeTabela == 'ObjetosEvento':
 		obj = ObjetosEvento.objects.get(id=pk)
 	elif nomeTabela == 'Cidade':
@@ -303,23 +292,38 @@ def montarObjetoSalvar(nomeTabela,post):
 		logradouro     = post['logradouro']
 		numero         = post['numero']
 		cidade         = Cidade.objects.get(id=post['clienteCidade'])
-		bairro         = Bairro.objects.get(id=post['clienteBairro']) 
+		bairro         = Bairro.objects.get(id=post['clienteBairro'])
+		
+		temp           = post['contato01']
+		contato01      = temp[1:3]+ temp[4:8] + temp[9:13]
+		temp           = post['contato02']
+		contato02      = temp[1:3]+ temp[4:8] + temp[9:13]
+		temp           = post['contato03']
+		contato03      = temp[1:3]+ temp[4:8] + temp[9:13] 
+		
 		email          = post['email']
 		RG             = post['RG']
-		CPF            = post['CPF']
-
+		temp 		   = post['CPF']
+		CPF           = temp[0:3]+ temp[4:7] + temp[8:11] + temp[12:14]
+		
 		dataNascimento = post['dataNascimento']
 		comoConheceu   = post['comoConheceu']
-		if 	post.has_key('eventoAnterior'):
-			eventoAnterior = post['eventoAnterior']
-		else:
-			eventoAnterior = False
+		eventoAnterior = post['eventoAnterior']
+
 		
-		obj = Cliente(nome=nome,logradouro=logradouro,numero=numero,cidade=cidade,bairro=bairro,email=email,RG=RG,CPF=CPF,dataNascimento=dataNascimento,comoConheceu=comoConheceu,eventoAnterior=eventoAnterior)
-	elif nomeTabela == 'Contato':
-		contato        = post['contato']
-		cliente        = Cliente.objects.get(id=post['cliente'])
-		obj            = Contato(contato=contato,cliente=cliente)
+		obj = Cliente(nome=nome,
+					  contato01=contato01,
+					  contato02=contato02,
+					  contato03=contato03,
+					  logradouro=logradouro,
+					  numero=numero,
+					  cidade=cidade,
+					  bairro=bairro,
+					  email=email,
+					  RG=RG,CPF=CPF,
+					  dataNascimento=dataNascimento,
+					  comoConheceu=comoConheceu,
+					  eventoAnterior=eventoAnterior)
 	elif nomeTabela == 'Cor':
 		descricao      = post['descricao']
 		obj            = Cor(descricao=descricao)
@@ -338,18 +342,28 @@ def montarObjetoSalvar(nomeTabela,post):
 		horaTermino    = post['horaTermino']
 		numCobertas    = post['numCobertas']
 		corCoberta     = Cor.objects.get(id=post['corCoberta'])	
-		obj            = Evento(data=data,tipoEvento=tipoEvento,cliente=cliente,pagaraLimpeza=pagaraLimpeza,valorTotal=valorTotal,horaInicio=horaInicio,horaTermino=horaTermino,numCobertas=numCobertas,corCoberta=corCoberta)
+		obj            = Evento(data=data,
+								tipoEvento=tipoEvento,
+								cliente=cliente,
+								pagaraLimpeza=pagaraLimpeza,
+								valorTotal=valorTotal,
+								horaInicio=horaInicio,
+								horaTermino=horaTermino,
+								numCobertas=numCobertas,
+								corCoberta=corCoberta)
 	elif nomeTabela == 'ObjetosEvento':
 		descricao      = post['descricao']
 		obj            = ObjetosEvento(descricao=descricao)
 	elif nomeTabela == 'Cidade':
 		descricao      = post['descricao']
 		uf             = post['UF']
-		obj            = Cidade(descricao=descricao,estado=uf)
+		obj            = Cidade(descricao=descricao,
+								estado=uf)
 	elif nomeTabela == 'Bairro':
 		descricao      = post['descricao']
 		cidade         = Cidade.objects.get(id=post['bairroCidade'])
-		obj            = Bairro(descricao=descricao,cidade=cidade)
+		obj            = Bairro(descricao=descricao,
+						        cidade=cidade)
 
 	return obj
 	
