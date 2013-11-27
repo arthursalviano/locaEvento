@@ -1,23 +1,30 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block javascript %}
+  $('img').attr('width',50);
+  $('img').attr('height',50);
+{% endblock %}
 {% block content %}
 
-<div class="container">
-  	<div class="panel panel-primary">
-  		<div class="panel-heading">
-    		<h1 class="panel-title">Ações</h1>
-  		</div>
-  		<div class="panel-body">
-    		<div class="btn-group">
-  				<ul class="nav nav-justified">
-  					<li><a class="btn" href="/cadastros/"><h3>Cadastros gerais</h3></a></li>
-            <li><a class="btn" href="/cadastros/"><h3> Eventos </h3></a></li>
-  					<li><a class="btn" href="/documentos/"><h3>Documentos</h3></a></li>
-  					<li><a class="btn" href="/cronograma/"><h3>Cronograma</h3></a></li>
-  					<li><a class="btn" href="/relatorios/"><h3>Relatórios</h3></a></a></li>
-  				</ul>
-			</div>
-  		</div>
-	</div>
+  <div class="container">
+        <div class="btn-group btn-group-justified">
+              <a href="/cadastros/" type="button" class="btn btn-success btn-lg"><img  src="{% static 'Bootstrap/img/records.png' %}" alt="Cadastros"/>
+                <h3>Cadastros</h3>
+              </a>
+              <a href="evento/novo/" type="button" class="btn btn-success btn-lg"><img  src="{% static 'Bootstrap/img/event.png' %}" alt="Eventos"/>
+              <h3>Novo evento</h3>
+              </a>
+              <a href="/documentos/" type="button" class="btn btn-success btn-lg"><img  src="{% static 'Bootstrap/img/document.png' %}" alt="documentos"/>
+                <h3>Documentos</h3>
+              </a>
+              <a href="/cronograma/" type="button" class="btn btn-success btn-lg"><img  src="{% static 'Bootstrap/img/calendar.png' %}" alt="cronograma"/>
+                <h3>Cronograma</h3>
+              </a>
+              <a href="/relatorios/" type="button" class="btn btn-success btn-lg"><img  src="{% static 'Bootstrap/img/report.png' %}" alt="relatórios"/>
+                <h3>Relatórios</h3>
+              </a>            
+      </div>
+</div>
 
 {% endblock %}
 

@@ -12,7 +12,8 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'D:\Projetos_Django\locaEvento\locaEvento\Banco\BancoLocaEvento.sqlite', #SEPLAN     
+        'NAME': 'E:\Projetos\locaEvento\Banco\BancoLocaEvento.sqlite'
+        #'NAME': 'D:\Projetos_Django\locaEvento\locaEvento\Banco\BancoLocaEvento.sqlite', #SEPLAN     
         #'NAME': 'C:\Django\locaEvento\Banco\BancoLocaEvento.sqlite',  #Suelem
         # The following settings are not used with sqlite3:
         #'USER': '',
