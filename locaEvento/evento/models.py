@@ -81,19 +81,28 @@ class Evento(models.Model):
 	data          = models.DateField()
 	tipoEvento    = models.ForeignKey(TipoEvento,on_delete=models.PROTECT)
 	cliente       = models.ForeignKey(Cliente,on_delete=models.PROTECT)
-	pagaraLimpeza = models.BooleanField()
-	valorTotal    = models.FloatField(max_length=5)
+	pagaraLimpeza = models.CharField(max_length=5)
+	valorTotal    = models.FloatField(max_length=10)
 	objetos       = models.ManyToManyField(ObjetosEvento)
 	horaInicio    = models.TimeField()
 	horaTermino   = models.TimeField()
+	duracao       = models.TimeField()
 	numCobertas   = models.SmallIntegerField(blank=True,null=True)
-	corCoberta    = models.ForeignKey(Cor,on_delete=models.PROTECT)
+	corCoberta    = models.ForeignKey(Cor,on_delete=models.PROTECT,blank=True,null=True)
 
 	def __unicode__(self):
 		return self.data
 
 	class meta:
 		ordering = ['data'] 
+
+# Parcela
+class Parcela(models.Model):
+	dataPagamento  = models.DateField()
+	valorParcela   = models.FloatField(max_length=10)
+	foiPaga        = models.CharField(max_length=5)
+	evento         = models.ForeignKey(Evento,on_delete=models.PROTECT,null=True)
+
 
 
 

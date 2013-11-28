@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from django.core import serializers
 from django.shortcuts import render
 from django.shortcuts import render_to_response
+from datetime import time
 #from reportlab.pdfgen import canvas
 #from xhtml2pdf import pisa
 #from report import write_to_pdf
@@ -100,7 +101,7 @@ def pgNovo(request):
 													 'clientes' : clientes,
 													 'cidades':cidades,
 													 'tiposEvento':tiposEvento,
-													 'objetosEvento': objetos,
+													 'objetos': objetos,
 													 'cores': cores,
 													 'bairros':bairros,
 													 'msg':'novo'	
@@ -211,6 +212,8 @@ def recuperarItens(nomeTabela):
 		obj = Cidade.objects.all()
 	elif nomeTabela == 'Bairro':
 		obj = Bairro.objects.all()
+	elif nomeTabela == 'Evento':
+		obj = Bairro.objects.all()
 
 	return obj
 
@@ -287,6 +290,7 @@ def montarObjetoSalvar(nomeTabela,post):
 	if  nomeTabela == 'TipoEvento':
 		descricao      = post['descricao']
 		obj            = TipoEvento(descricao=descricao)
+	
 	elif nomeTabela == 'Cliente':
 		nome           = post['nome']
 		logradouro     = post['logradouro']
@@ -324,33 +328,57 @@ def montarObjetoSalvar(nomeTabela,post):
 					  dataNascimento=dataNascimento,
 					  comoConheceu=comoConheceu,
 					  eventoAnterior=eventoAnterior)
+	
 	elif nomeTabela == 'Cor':
 		descricao      = post['descricao']
 		obj            = Cor(descricao=descricao)
+	
 	elif nomeTabela == 'Evento':
-		data           = post['data_year']+"-"+post['data_month']+"-"+post['data_day']
-		tipoEvento     = TipoEvento.objects.get(id=post['tipoEvento'])
-		cliente        = Cliente.objects.get(id=post['cliente']) 
-		
+		data           = post['data']
+		tipoEvento     = TipoEvento.objects.get(id=post['TipoEvento'])
+		cliente        = Cliente.objects.get(id=post['Cliente']) 
 		if 	post.has_key('pagaraLimpeza'):
 			pagaraLimpeza  = post['pagaraLimpeza']
-		else:
-			pagaraLimpeza = False			
+		
+		temp = post['valorTotal']
 
-		valorTotal     = post['valorTotal']
-		horaInicio     = post['horaInicio']
-		horaTermino    = post['horaTermino']
-		numCobertas    = post['numCobertas']
-		corCoberta     = Cor.objects.get(id=post['corCoberta'])	
-		obj            = Evento(data=data,
+		valorTotal     = temp[0:1] + temp[2:5] + "." + temp[6:8]
+		valorTotal = float(valorTotal)
+		
+		horaInicio = post['horaInicio']
+		horaTermino = post['horaTermino']
+		duracao        = subtrairHora(horaInicio,horaTermino)
+		if 	post['numCobertas']:
+			numCobertas    = int(post['numCobertas'])
+		else:
+			numCobertas = 0
+
+		if 	post.has_key('corCoberta'):
+			corCoberta    = Cor(descricao=post['corCoberta'])
+
+		
+		if post.has_key('corCoberta'):
+			obj            = Evento(data=data,
 								tipoEvento=tipoEvento,
 								cliente=cliente,
 								pagaraLimpeza=pagaraLimpeza,
 								valorTotal=valorTotal,
 								horaInicio=horaInicio,
 								horaTermino=horaTermino,
+								duracao=duracao,
 								numCobertas=numCobertas,
 								corCoberta=corCoberta)
+		else:
+			obj            = Evento(data=data,
+								tipoEvento=tipoEvento,
+								cliente=cliente,
+								pagaraLimpeza=pagaraLimpeza,
+								valorTotal=valorTotal,
+								horaInicio=horaInicio,
+								horaTermino=horaTermino,
+								duracao=duracao,
+								numCobertas=numCobertas)
+		
 	elif nomeTabela == 'ObjetosEvento':
 		descricao      = post['descricao']
 		obj            = ObjetosEvento(descricao=descricao)
@@ -372,3 +400,35 @@ def definirTabela(path):
 	tela = tela.split('/')
 	tela = tela[2]
 	return tela 
+
+def subtrairHora(horaInicio, horaTermino):
+	
+	horaIni    = int(horaInicio[0:2])
+	minuteIni  = int(horaInicio[3:5])
+	segundosIni = (horaIni*60) + minuteIni
+
+	horaTerm   = int(horaTermino[0:2])
+	minuteTerm = int(horaTermino[3:5])
+	segundosTerm = (horaTerm*60) + minuteTerm
+
+	segundosDuracao = segundosTerm - segundosIni
+	
+	horaDuracao = segundosDuracao/60
+	if horaDuracao > 9:
+		horaDuracao = "0"+ str(horaDuracao)
+	else:
+		horaDuracao = str(horaDuracao)
+
+	minutoDuracao = str(segundosDuracao%60)
+	if minutoDuracao < 9:
+		minutoDuracao = "0"+ str(minutoDuracao)
+	else:
+		minutoDuracao = str(minutoDuracao)
+
+	duracao = horaDuracao + ":"+minutoDuracao
+
+	return duracao
+
+ 
+
+

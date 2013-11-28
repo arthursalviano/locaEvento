@@ -24,15 +24,34 @@
 
 		{# o botão que ativa o modal para redirecionar os cadastros necessários é feita aqui#}
 
-		{% if msg == "Novo" %}
+		{% if msg == "novo" %}
 			{% if nomeTela == "Bairro" %} 
 	        	{% if not cidades %}
 	        		$('#ButtonModal2').trigger("click");
 	        	{% endif %}
 	    	{% endif %}
+	    	
 	    	{% if nomeTela == "Cliente" %} 
 	        	{% if not bairros %}
 	        		$('#ButtonModal2').trigger("click");
+	        	{% endif %}
+	    	{% endif %}
+
+	    	{% if nomeTela == "Evento" %} 
+	        	{% if not tiposEvento %}
+	        		$('#ButtonModal2').trigger("click");
+	        	{% else %}
+	        		{% if not clientes %}
+	        			$('#ButtonModal2').trigger("click");
+	        		{% else %}
+	        			{% if not objetos %}
+	        				$('#ButtonModal2').trigger("click");
+	        			{% else %}
+	        				{% if not cores %}
+	        					$('#ButtonModal2').trigger("click");
+	        				{% endif %}
+	        			{% endif %}
+	        		{% endif %}
 	        	{% endif %}
 	    	{% endif %}
 	    {% endif %}
@@ -50,13 +69,33 @@
 		$('#botaoOk2').click(
 			function(){
 				url = "http://localhost:8000/cadastros/";
+				
 				{% if nomeTela == 'Bairro' %}
 					url = url + "Cidade";
 				{% else %}
 					{% if nomeTela == 'Cliente' %}
 						url = url + "Bairro";
+					{% else %}
+						{% if nomeTela == "Evento" %} 
+	        				{% if not tiposEvento %}
+	        					url = url + "TipoEvento";
+	        				{% else %}
+	        					{% if not clientes %}
+	        						url = url + "Cliente";
+	        					{% else %}
+	        						{% if not objetos %}
+	        							url = url + "ObjetosEvento";
+	        						{% else %}
+	        							{% if not cores %}
+	        								url = url + "Cor";
+	        							{% endif %}
+	        						{% endif %}
+	        					{% endif %}
+	        				{% endif %}
+	    				{% endif %}
 					{% endif %}
 				{% endif %}
+				
 				url = url + "/novo/";
 				$(location).attr('href',url);
 			}
@@ -105,9 +144,7 @@
 			$('#clienteCidade').val("{{ obj.cidade.id }}");
 			$('#clienteCidade').trigger("change");
 		{% endifequal %}
-
-		
-		
+	
 {% endblock %}
 
 
@@ -436,12 +473,23 @@
 	{% ifequal nomeTela "Evento" %}
 		<div class="form-group">
 		    <div class="col-xs-2">
-			    <label for="data" >Data</label>
+			    <label for="data" >Data do evento</label>
 			    <input type="date" class="form-control" id="data" name="data" placeholder="Data" required>
 			</div>
+			<div class="col-xs-2">
+				<label for="horaInicio" >Hora de início </label>
+		    	<input type="time" class="form-control" id="horaInicio" name="horaInicio" placeholder="Hora de Início" required>
+			</div>
+			<div class="col-xs-2">
+		    	<label for="horaTérmino" >Hora de término</label>
+		    	<input type="time" class="form-control" id="horaTermino" name="horaTermino" placeholder="Hora de Término" required>
+			</div>
+		</div>
+		<div class="form-group">
 			<div class="col-xs-3">
 					<label for="TipoEvento">Tipo de Evento</label>
 				    <select class="form-control" id="TipoEvento" name="TipoEvento" required>
+		  				<option value="">Escolha um tipo de evento</option>
 		  				{% for tipo in tiposEvento %}
 		  					<option value="{{ tipo.id }}">{{ tipo.descricao }}</option>
 		  				{% endfor %}
@@ -450,6 +498,7 @@
 			<div class="col-xs-5">
 					<label for="Cliente">Cliente</label>
 				    <select class="form-control" id="Cliente" name="Cliente" required>
+		  				<option value="">Escolha um cliente</option>
 		  				{% for cliente in clientes %}
 		  					<option value="{{ cliente.id }}">{{ cliente.nome }}</option>
 		  				{% endfor %}
@@ -460,8 +509,8 @@
 		<div class="form-group">
 			<div class="col-xs-4">
 					<label for="ObjetosEvento">Objetos</label>
-				    <select class="form-control" id="ObjetosEvento" name="ObjetosEvento" multiple required>
-		  				{% for objeto in objetosEvento %}
+				    <select class="form-control" id="ObjetosEvento" name="ObjetosEvento" multiple>
+		  				{% for objeto in objetos %}
 		  					<option value="{{ objeto.id }}">{{ objeto.descricao }}</option>
 		  				{% endfor %}
 					</select>
@@ -481,30 +530,31 @@
 				  </label>
 				</div>
 			</div>
-			<div class="col-xs-2">
-				<label for="horaInicio" >Hora de início </label>
-		    	<input type="time" class="form-control" id="horaInicio" name="horaInicio" placeholder="Hora de Início" required>
-			</div>
-			<div class="col-xs-2">
-		    	<label for="horaTérmino" >Hora de término</label>
-		    	<input type="time" class="form-control" id="horaTermino" name="horaTermino" placeholder="Hora de Término" required>
-			</div>		
+					
 		</div>
 		<div class="form-group">
 			<div class="col-xs-2">
 		    	<label for="numCobertas" >Número de cobertas</label>
-		    	<input type="number" class="form-control" id="numCobertas" name="numCobertas" placeholder="Número de cobertas" required>
+		    	<input type="number" class="form-control" id="numCobertas" name="numCobertas" placeholder="Número de cobertas">
 			</div>
 			<div class="col-xs-3">
 		    	<label for="Cor" >Cor da coberta</label>
-		    	<select class="form-control" id="Cor" name="Cor" required>
+		    	<select class="form-control" id="Cor" name="Cor" >
 		  				{% for cor in cores %}
 		  					<option value="{{ cor.id }}">{{ cor.descricao }}</option>
 		  				{% endfor %}
 					</select>
 			</div>
+		</div>
+		<div class="form-group">
 			<div class="col-xs-3">
 		    	<label for="valorTotal">Valor Total do evento</label>
+		    	<input type="text" class="form-control" id="valorTotal" name="valorTotal" placeholder="Valor Total" required>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-xs-3">
+		    	<label for="valorTotal">Número de parcelas</label>
 		    	<input type="text" class="form-control" id="valorTotal" name="valorTotal" placeholder="Valor Total" required>
 			</div>
 		</div>
@@ -538,6 +588,7 @@
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 
+<!-- Alerta de cadastros não feitos -->
 	<div class="modal fade" id="avisoTabelasNecessarias" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
 	    <div class="modal-content">
@@ -547,16 +598,38 @@
 	      </div>
 	      <div class="modal-body">
 	        <h4>
-	        {% if nomeTela == "Bairro" %} 
-	        	{% if not cidades %}
-	        	Para cadastrar um Bairro é necessário primeiro cadastrar alguma cidade. Você será redirecionado para a tela de cadastro de Cidade.
+	        {% if msg == "novo" %}
+		        
+		        {% if nomeTela == "Bairro" %} 
+		        	{% if not cidades %}
+		        		Para cadastrar um Bairro é necessário primeiro cadastrar alguma cidade. Você será redirecionado para a tela de cadastro de Cidade.
+		        	{% endif %}
+		       {% endif %}
+
+		       {% if nomeTela == "Cliente" %} 
+	        		{% if not bairros %}
+	        			Para cadastrar um Cliente é necessário primeiro cadastrar algum Bairro. Você será redirecionado para a tela de cadastro de 	Bairro.
+	        		{% endif %}
 	        	{% endif %}
-	       {% endif %}
-	       {% if nomeTela == "Cliente" %} 
-	        	{% if not bairros %}
-	        	Para cadastrar um Cliente é necessário primeiro cadastrar algum Bairro. Você será redirecionado para a tela de cadastro de Bairro.
+
+	        	{% if nomeTela == "Evento" %} 
+	        	{% if not tiposEvento %}
+	        		Para cadastrar um Evento é necessário primeiro cadastrar algum tipo de evento. Você será redirecionado para a tela de cadastro de Tipo de evento.
+	        	{% else %}
+	        		{% if not clientes %}
+	        			Para cadastrar um Evento é necessário primeiro cadastrar algum cliente. Você será redirecionado para a tela de cadastro de Clientes .
+	        		{% else %}
+	        			{% if not objetos %}
+	        				Para cadastrar um Evento é necessário primeiro cadastrar algum objeto de evento. Você será redirecionado para a tela de cadastro de objetos do evento.
+	        			{% else %}
+	        				{% if not cores %}
+	        					Para cadastrar um Evento é necessário primeiro cadastrar alguma cor. Você será redirecionado para a tela de cadastro de cores.
+	        				{% endif %}
+	        			{% endif %}
+	        		{% endif %}
 	        	{% endif %}
-	       {% endif %}
+	    	{% endif %}
+	       	{% endif %}
 	       </h4>
 	      </div>
 	      <div class="modal-footer">
