@@ -20,10 +20,7 @@ urlpatterns = patterns('',
     url(r'mudarCidade/(.+)/$',mudarCidade),
 
     #### Acesso direto a metodos
-   #url(r'pesquisar/(+w)/(+w)/$',pesquisar),
-   
-
-
+    #url(r'pesquisar/(+w)/(+w)/$',pesquisar),
 
     #url(r'pdf/$', pdfHtmlPisa2),
     #url(r'contrato/$', contrato),

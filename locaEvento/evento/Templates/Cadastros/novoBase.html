@@ -143,6 +143,28 @@
 			
 			$('#clienteCidade').val("{{ obj.cidade.id }}");
 			$('#clienteCidade').trigger("change");
+
+			
+			$('#EventoTipoEvento').val( {{ obj.tipoEvento.id }})
+			$('#EventoCliente').val( {{ obj.cliente.id }})
+			$('#EventoCor').val( {{ obj.corCoberta.id }})
+
+			{% if obj.pagaraLimpeza == "Sim" %}
+				$('#pagaraSim').attr("checked","checked");
+			{% else %}
+				$('#pagaraNao').attr("checked","checked");
+			{% endif %}
+
+
+		    valorTotal = "{{ obj.valorTotal }}";
+		    if (valorTotal.length != 7){
+		    	valorTotal = "0" + valorTotal + "0";
+			}
+
+			valorTotal = valorTotal.substr(0,4) + valorTotal.substr(5,2);
+			$("#valorTotal").val(valorTotal);
+			$("#valorTotal").mask("9.999,99");
+			
 		{% endifequal %}
 	
 {% endblock %}
@@ -472,92 +494,134 @@
 
 	{% ifequal nomeTela "Evento" %}
 		<div class="form-group">
-		    <div class="col-xs-2">
-			    <label for="data" >Data do evento</label>
-			    <input type="date" class="form-control" id="data" name="data" placeholder="Data" required>
+		    <div class="col-xs-4">
+			    <div class="panel panel-primary">
+			  			<div class="panel-heading">
+			    			<h1 class="panel-title"><strong>Data e horário</strong></h1>
+			  			</div>
+			  		<div class="panel-body">
+				    		<label for="data" >Data do evento</label>
+				    		<input type="date" class="form-control" id="data" name="data" placeholder="Data" 
+				    		{% ifequal editar "editar" %}
+		    					value="{{ obj.data|date:"Y-m-d"  }}"
+		    				{% endifequal %}
+				    		required><br>
+				    		<label for="horaInicio" >Hora de início </label>
+			    			<input type="time" class="form-control" id="horaInicio" name="horaInicio" placeholder="Hora de Início" 
+			    			{% ifequal editar "editar" %}
+		    					value="{{ obj.horaInicio }}"
+		    				{% endifequal %}
+			    			required><br>
+			    			<label for="horaTérmino" >Hora de término</label>
+			    			<input type="time" class="form-control" id="horaTermino" name="horaTermino" placeholder="Hora de Término" 
+			    			{% ifequal editar "editar" %}
+		    					value="{{ obj.horaTermino }}"
+		    				{% endifequal %}
+			    			required>
+					</div>
+			  	</div>
 			</div>
-			<div class="col-xs-2">
-				<label for="horaInicio" >Hora de início </label>
-		    	<input type="time" class="form-control" id="horaInicio" name="horaInicio" placeholder="Hora de Início" required>
-			</div>
-			<div class="col-xs-2">
-		    	<label for="horaTérmino" >Hora de término</label>
-		    	<input type="time" class="form-control" id="horaTermino" name="horaTermino" placeholder="Hora de Término" required>
-			</div>
-		</div>
-		<div class="form-group">
-			<div class="col-xs-3">
-					<label for="TipoEvento">Tipo de Evento</label>
-				    <select class="form-control" id="TipoEvento" name="TipoEvento" required>
-		  				<option value="">Escolha um tipo de evento</option>
-		  				{% for tipo in tiposEvento %}
-		  					<option value="{{ tipo.id }}">{{ tipo.descricao }}</option>
-		  				{% endfor %}
-					</select>
-			</div>
-			<div class="col-xs-5">
-					<label for="Cliente">Cliente</label>
-				    <select class="form-control" id="Cliente" name="Cliente" required>
-		  				<option value="">Escolha um cliente</option>
-		  				{% for cliente in clientes %}
-		  					<option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-		  				{% endfor %}
-					</select>
-			</div>
-		</div>
-
-		<div class="form-group">
 			<div class="col-xs-4">
-					<label for="ObjetosEvento">Objetos</label>
-				    <select class="form-control" id="ObjetosEvento" name="ObjetosEvento" multiple>
-		  				{% for objeto in objetos %}
-		  					<option value="{{ objeto.id }}">{{ objeto.descricao }}</option>
-		  				{% endfor %}
-					</select>
+			    <div class="panel panel-primary">
+			  			<div class="panel-heading">
+			    			<h1 class="panel-title"><strong>Cliente e tipo de evento</strong></h1>
+			  			</div>
+			  			<div class="panel-body">
+							<label for="TipoEvento">Tipo de Evento</label>
+				    		<select class="form-control" id="EventoTipoEvento" name="TipoEvento" required>
+		  						<option value="">Escolha um tipo de evento</option>
+		  						{% for tipo in tiposEvento %}
+		  							<option value="{{ tipo.id }}">{{ tipo.descricao }}</option>
+		  						{% endfor %}
+							</select>
+							<br>
+							<label for="Cliente">Cliente</label>
+				    			<select class="form-control" id="EventoCliente" name="Cliente" required>
+		  							<option value="">Escolha um cliente</option>
+		  							{% for cliente in clientes %}
+		  								<option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+		  							{% endfor %}
+								</select>
+							<br>
+							<label for="pagaraLimpeza">Pagará a limpeza?</label>
+							<div class="radio">
+				  				<label>
+				    				<input type="radio" name="pagaraLimpeza" id="pagaraSim" value="Sim" checked>
+				    				Sim
+				  				</label>
+							</div>
+							<div class="radio">
+				  				<label>
+				    				<input type="radio" name="pagaraLimpeza" id="pagaraNao" value="Não">
+				   			 		Não
+				  				</label>
+							</div>
+						</div>
+			  	</div>
 			</div>
 			<div class="col-xs-2">
-				<label for="ObjetosEvento">Pagará a limpeza?</label>
-				<div class="radio">
-				  <label>
-				    <input type="radio" name="pagaraLimpeza" id="pagaraSim" value="Sim" checked>
-				    Sim
-				  </label>
-				</div>
-				<div class="radio">
-				  <label>
-				    <input type="radio" name="pagaraLimpeza" id="pagaraNao" value="Não">
-				    Não
-				  </label>
-				</div>
-			</div>
-					
+				<div class="panel panel-primary">
+		  			<div class="panel-heading">
+		    			<h1 class="panel-title"><strong>Objetos</strong></h1>
+		  			</div>
+		  		<div class="panel-body">
+		    		{% for objeto in objetos %}
+   	 					<input type="checkbox" name="ObjetosEvento"  value="{{ objeto.id }}"
+   	 					{% ifequal editar "editar" %}
+   	 						{% for objetoEvento in obj.objetos.all %}	
+		    					{% if objeto.id == objetoEvento.id %}
+		    						checked
+		    					{% endif %}
+		    				{% endfor %}
+		    			{% endifequal %}
+   	 						>
+    						<strong>{{ objeto.descricao }}</strong><br><br>
+    				{% endfor %}
+					</div>
+		  		</div>		
+			</div>	
 		</div>
 		<div class="form-group">
-			<div class="col-xs-2">
-		    	<label for="numCobertas" >Número de cobertas</label>
-		    	<input type="number" class="form-control" id="numCobertas" name="numCobertas" placeholder="Número de cobertas">
-			</div>
 			<div class="col-xs-3">
-		    	<label for="Cor" >Cor da coberta</label>
-		    	<select class="form-control" id="Cor" name="Cor" >
+				<div class="panel panel-primary">
+		  			<div class="panel-heading">
+		    			<h1 class="panel-title"><strong>Cobertas</strong></h1>
+		  			</div>
+		  		<div class="panel-body">
+		    		<label for="numCobertas" >Número de cobertas</label>
+		    		<input type="number" class="form-control" id="numCobertas" name="numCobertas" 
+		    		{% ifequal editar "editar" %}
+		    			value="{{ obj.numCobertas }}"
+		    		{% endifequal %}
+		    		>
+		    		<br/>
+					<label for="Cor" >Cor da coberta</label>
+		    		<select class="form-control" id="EventoCor" name="Cor" >
+		  				<option value="">Escolha uma cor</option>
 		  				{% for cor in cores %}
 		  					<option value="{{ cor.id }}">{{ cor.descricao }}</option>
 		  				{% endfor %}
 					</select>
-			</div>
-		</div>
-		<div class="form-group">
-			<div class="col-xs-3">
-		    	<label for="valorTotal">Valor Total do evento</label>
-		    	<input type="text" class="form-control" id="valorTotal" name="valorTotal" placeholder="Valor Total" required>
-			</div>
-		</div>
-		<div class="form-group">
-			<div class="col-xs-3">
-		    	<label for="valorTotal">Número de parcelas</label>
-		    	<input type="text" class="form-control" id="valorTotal" name="valorTotal" placeholder="Valor Total" required>
-			</div>
-		</div>
+				</div>
+		  		</div>
+		  	</div>
+		  	<div class="col-xs-3">
+				<div class="panel panel-primary">
+		  			<div class="panel-heading">
+		    			<h1 class="panel-title"><strong>Pagamento</strong></h1>
+		  			</div>
+		  		<div class="panel-body">
+		    		<label for="valorTotal">Valor Total do evento</label>
+		    		<input type="text" class="form-control" id="valorTotal" name="valorTotal" placeholder="Valor Total" 
+		    		
+		    		required>
+					<br/>
+					<label for="parcelas">Número de parcelas</label>
+		    		<input type="text" class="form-control" id="parcelas" name="parcelas" placeholder="Parcelas" required>
+				</div>
+		  		</div>
+		  	</div>
+		</div>,
 	{% endifequal %}
 		
 		{% block botoes %}

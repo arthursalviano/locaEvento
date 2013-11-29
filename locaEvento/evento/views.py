@@ -114,13 +114,15 @@ def pgSalvar(request):
 		#try:
 		url = 'Cadastros/novoBase.html'
 		obj = montarObjetoSalvar(tabela,request.POST)
-		obj.save()
-		if request.POST.has_key('objetos'):
-			objetos = ObjetosEvento.objects.filter(id__in=request.POST['objetos'])
+		obj.save() 
+		if request.POST.has_key('ObjetosEvento'):
+			listaObjetos = request.POST.getlist('ObjetosEvento')
+			objetos = ObjetosEvento.objects.filter(id__in=listaObjetos)
 			for objeto in objetos:	
 				obj.objetos.add(objeto)
 		msg = "Salvo"
 		#except:
+		#return HttpResponse(request.POST['pagaraLimpeza'])
 		#return HttpResponse("Erro ao salvar arquivo ")	
 		return render(request,url,{'nomeTela':tabela, 'msg':msg})
 
@@ -160,29 +162,24 @@ def pgEditar(request,id):
 			cidades  = Cidade.objects.all()
 		elif tabela == "Cliente" :
 			cidades  = Cidade.objects.all()
-		"""
 		elif tabela == "Evento":
 			tiposEvento = TipoEvento.objects.all()
 			clientes = Cliente.objects.all()
 			objetos = ObjetosEvento.objects.all()
 			cores     = Cor.objects.all()
 
+
+		if obj:
 			return render(request,'Cadastros/EditarBase.html',{'nomeTela':tabela,
 													 'clientes' : clientes,
 													 'cidades':cidades,
 													 'tiposEvento':tiposEvento,
-													 'objetosEvento': objetos,
+													 'objetos': objetos,
 													 'cores': cores,
 													 'obj':obj,
 													 'editar':'editar'	
 													  })
-			#
-		"""
-		if obj:
-			return render(request,'Cadastros/editarBase.html',{'nomeTela':tabela, 
-															   'obj':obj,
-															   'cidades':cidades,
-															   'editar':'editar'})
+			
 		else:
 			return HttpResponse("Objeto Vazio")
 
@@ -290,7 +287,6 @@ def montarObjetoSalvar(nomeTabela,post):
 	if  nomeTabela == 'TipoEvento':
 		descricao      = post['descricao']
 		obj            = TipoEvento(descricao=descricao)
-	
 	elif nomeTabela == 'Cliente':
 		nome           = post['nome']
 		logradouro     = post['logradouro']
@@ -328,37 +324,33 @@ def montarObjetoSalvar(nomeTabela,post):
 					  dataNascimento=dataNascimento,
 					  comoConheceu=comoConheceu,
 					  eventoAnterior=eventoAnterior)
-	
 	elif nomeTabela == 'Cor':
 		descricao      = post['descricao']
 		obj            = Cor(descricao=descricao)
-	
 	elif nomeTabela == 'Evento':
+		
 		data           = post['data']
 		tipoEvento     = TipoEvento.objects.get(id=post['TipoEvento'])
 		cliente        = Cliente.objects.get(id=post['Cliente']) 
-		if 	post.has_key('pagaraLimpeza'):
-			pagaraLimpeza  = post['pagaraLimpeza']
+		pagaraLimpeza  = post['pagaraLimpeza']
 		
 		temp = post['valorTotal']
 
 		valorTotal     = temp[0:1] + temp[2:5] + "." + temp[6:8]
-		valorTotal = float(valorTotal)
+		valorTotal     = float(valorTotal)
 		
-		horaInicio = post['horaInicio']
-		horaTermino = post['horaTermino']
+		horaInicio     = post['horaInicio']
+		horaTermino    = post['horaTermino']
 		duracao        = subtrairHora(horaInicio,horaTermino)
+
 		if 	post['numCobertas']:
 			numCobertas    = int(post['numCobertas'])
 		else:
 			numCobertas = 0
 
-		if 	post.has_key('corCoberta'):
-			corCoberta    = Cor(descricao=post['corCoberta'])
-
-		
-		if post.has_key('corCoberta'):
-			obj            = Evento(data=data,
+		if 	post['Cor']:
+			corCoberta    = Cor.objects.get(id=post['Cor'])
+			obj           = Evento(data=data,
 								tipoEvento=tipoEvento,
 								cliente=cliente,
 								pagaraLimpeza=pagaraLimpeza,
@@ -369,7 +361,7 @@ def montarObjetoSalvar(nomeTabela,post):
 								numCobertas=numCobertas,
 								corCoberta=corCoberta)
 		else:
-			obj            = Evento(data=data,
+			obj           = Evento(data=data,
 								tipoEvento=tipoEvento,
 								cliente=cliente,
 								pagaraLimpeza=pagaraLimpeza,
