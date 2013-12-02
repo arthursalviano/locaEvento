@@ -132,6 +132,15 @@ def atualizar(request,pk):
 		obj = montarObjetoSalvar(tabela,request.POST)
 		obj.id = pk
 		obj.save()
+		if request.POST.has_key('ObjetosEvento'):
+			for objeto in obj.objetos.all():
+				obj.objetos.remove(objeto)
+
+			listaObjetos = request.POST.getlist('ObjetosEvento')
+			objetos = ObjetosEvento.objects.filter(id__in=listaObjetos)
+			
+			for objeto in objetos:	
+				obj.objetos.add(objeto)
 		resultSet  = recuperarItens(tabela) 
 		return render(request,'Cadastros/detalhesBase.html',{'nomeTela':tabela, 'listItem':resultSet,'editar':'editar'})
 	else:

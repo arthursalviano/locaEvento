@@ -6,6 +6,7 @@
 		
 		$("#ButtonModal").hide();
 		$("#ButtonModal2").hide();
+		$(".parcelas").hide();
 			
 		{# máscaras #}
 
@@ -106,30 +107,30 @@
 		{% if nomeTela == 'Cliente' %}
 		
 		$( "#clienteCidade" ).change(function() {
-				idCidade = $("#clienteCidade").val();
-				url = "/mudarCidade/"+idCidade+"/";
-
-				$.ajax({
-                type: "GET",
-                url: url,
-                dataType: "json",
-                success: function(retorno){
-                    $("#clienteBairro").empty();
-                    $("#clienteBairro").append('<option>Escolha um bairro</option>');
-                    $.each(retorno, function(i, item){
-                    	html = "<option value='" + item["pk"] + "'"; 
-                    	
-                    	{% if editar == "editar" %}
-                    	if(item['pk'] == {{ obj.bairro.id }}){
-                    		html = html + " selected " ;
-                    	}
-                    	{% endif %}
-                    	html = html + ">" + item.fields['descricao'] +"</option>";
-                        $("#clienteBairro").append(html);
-                    });
-                    $("#clienteBairro").show();
-                }
-            });
+						idCidade = $("#clienteCidade").val();
+						url = "/mudarCidade/"+idCidade+"/";
+		
+						$.ajax({
+		                type: "GET",
+		                url: url,
+		                dataType: "json",
+		                success: function(retorno){
+		                    $("#clienteBairro").empty();
+		                    $("#clienteBairro").append('<option>Escolha um bairro</option>');
+		                    $.each(retorno, function(i, item){
+		                    	html = "<option value='" + item["pk"] + "'"; 
+		                    	
+		                    	{% if editar == "editar" %}
+		                    	if(item['pk'] == {{ obj.bairro.id }}){
+		                    		html = html + " selected " ;
+		                    	}
+		                    	{% endif %}
+		                    	html = html + ">" + item.fields['descricao'] +"</option>";
+		                        $("#clienteBairro").append(html);
+		                    });
+		                    $("#clienteBairro").show();
+		                }
+		            	});
 		});
 		{% endif %}
 
@@ -156,9 +157,17 @@
 			{% endif %}
 
 
-		    valorTotal = "{{ obj.valorTotal }}";
-		    if (valorTotal.length != 7){
-		    	valorTotal = "0" + valorTotal + "0";
+		    valorTotal = "{{ obj.valorTotal }}"; 
+		    while(valorTotal.length != 7){
+		    	if (valorTotal[3] == ","){
+		    		valorTotal = "0" + valorTotal;		
+		    	}else if(valorTotal[2] == ",") {
+		    		valorTotal = "00" + valorTotal;
+		    	}else if(valorTotal[1] == ","){
+		    		valorTotal = "000" + valorTotal;
+		    	}else if(valorTotal[4] == ","){
+		    		valorTotal = valorTotal + "0";
+		    	} 
 			}
 
 			valorTotal = valorTotal.substr(0,4) + valorTotal.substr(5,2);
@@ -617,7 +626,69 @@
 		    		required>
 					<br/>
 					<label for="parcelas">Número de parcelas</label>
-		    		<input type="text" class="form-control" id="parcelas" name="parcelas" placeholder="Parcelas" required>
+				    			<select class="form-control" id="EventoParcelas" name="parcelas" required>
+		  								<option value="">Informe a quantidade de parcelas</option>
+		  								<option value="1">01</option>
+		  								<option value="2">02</option>
+		  								<option value="3">03</option>
+		  								<option value="4">04</option>
+		  								<option value="5">05</option>
+		  								<option value="6">06</option>
+		  								<option value="7">07</option>
+		  								<option value="8">08</option>
+		  								<option value="9">09</option>
+		  								<option value="10">10</option>
+								</select>
+				</div>
+		  		</div>
+		  	</div>
+		  	<div class="col-xs-2 parcelas">
+				<div class="panel panel-primary">
+		  			<div class="panel-heading">
+		    			<h1 class="panel-title"><strong>Parcelamento</strong></h1>
+		  			</div>
+		  		<div class="panel-body">
+		    		<label for="parcela01">1ª parcela</label>
+		    		<input type="text" class="form-control" id="parcela01" name="parcela01" 
+		    		
+		    		required>
+		    		<label for="parcela02">2ª parcela</label>
+		    		<input type="text" class="form-control" id="parcela02" name="parcela02" 
+		    		
+		    		required>
+		    		<label for="parcela04">3ª parcela</label>
+		    		<input type="text" class="form-control" id="parcela03" name="parcela03" 
+		    		
+		    		required>
+		    		<label for="parcela04">4ª parcela</label>
+		    		<input type="text" class="form-control" id="parcela04" name="parcela04" 
+		    		
+		    		required>
+		    		<label for="parcela05">5ª parcela</label>
+		    		<input type="text" class="form-control" id="parcela05" name="parcela05" 
+		    		
+		    		required>
+		    		<label for="parcela06">6ª parcela</label>
+		    		<input type="text" class="form-control" id="parcela06" name="parcela06" 
+		    		
+		    		required>
+		    		<label for="parcela07">7ª parcela</label>
+		    		<input type="text" class="form-control" id="parcela07" name="parcela07" 
+		    		
+		    		required>
+		    		<label for="parcela08">8ª parcela</label>
+		    		<input type="text" class="form-control" id="parcela08" name="parcela08" 
+		    		
+		    		required>
+		    		<label for="parcela09">9ª parcela</label>
+		    		<input type="text" class="form-control" id="parcela09" name="parcela09" 
+		    		
+		    		required>
+		    		<label for="parcela10">10ª parcela</label>
+		    		<input type="text" class="form-control" id="parcela10" name="parcela10" 
+		    		
+		    		required>
+					
 				</div>
 		  		</div>
 		  	</div>
