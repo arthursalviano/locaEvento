@@ -12,6 +12,8 @@ class Cidade(models.Model):
 	class Meta:
 		ordering=['descricao']
 
+# Tabela Bairro
+
 class Bairro(models.Model):
 	descricao 	   = models.CharField(max_length=50)
 	cidade         = models.ForeignKey(Cidade,on_delete=models.PROTECT)
@@ -46,7 +48,7 @@ class Cliente(models.Model):
 	class Meta:
 		ordering=['nome']
 
-# Tabela 
+# Tabela Objetos de evento
 class ObjetosEvento(models.Model):
 	descricao = models.CharField(max_length=30)
 
@@ -98,7 +100,7 @@ class Evento(models.Model):
 
 # Parcela
 class Parcela(models.Model):
-	dataPagamento  = models.DateField()
+	dataPagamento  = models.DateField(null=True)
 	valorParcela   = models.FloatField(max_length=10)
 	foiPaga        = models.CharField(max_length=5)
 	evento         = models.ForeignKey(Evento,on_delete=models.PROTECT,null=True)

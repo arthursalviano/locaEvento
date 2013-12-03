@@ -120,6 +120,12 @@ def pgSalvar(request):
 			objetos = ObjetosEvento.objects.filter(id__in=listaObjetos)
 			for objeto in objetos:	
 				obj.objetos.add(objeto)
+		if request.POST.has_key('parcelas'):
+			parcelas = {}
+			for i in range(int(request.POST['parcelas'])):
+				valor = converterMoneyParaBanco(request.POST['parcela'+str(i+1)])
+				obj2 = Parcela(valorParcela=valor,foiPaga="Não",evento=obj)
+				obj2.save()
 		msg = "Salvo"
 		#except:
 		#return HttpResponse(request.POST['pagaraLimpeza'])
@@ -176,7 +182,6 @@ def pgEditar(request,id):
 			clientes = Cliente.objects.all()
 			objetos = ObjetosEvento.objects.all()
 			cores     = Cor.objects.all()
-
 
 		if obj:
 			return render(request,'Cadastros/EditarBase.html',{'nomeTela':tabela,
@@ -337,17 +342,11 @@ def montarObjetoSalvar(nomeTabela,post):
 		descricao      = post['descricao']
 		obj            = Cor(descricao=descricao)
 	elif nomeTabela == 'Evento':
-		
 		data           = post['data']
 		tipoEvento     = TipoEvento.objects.get(id=post['TipoEvento'])
 		cliente        = Cliente.objects.get(id=post['Cliente']) 
 		pagaraLimpeza  = post['pagaraLimpeza']
-		
-		temp = post['valorTotal']
-
-		valorTotal     = temp[0:1] + temp[2:5] + "." + temp[6:8]
-		valorTotal     = float(valorTotal)
-		
+		valorTotal     = converterMoneyParaBanco(post['valorTotal'])
 		horaInicio     = post['horaInicio']
 		horaTermino    = post['horaTermino']
 		duracao        = subtrairHora(horaInicio,horaTermino)
@@ -378,8 +377,7 @@ def montarObjetoSalvar(nomeTabela,post):
 								horaInicio=horaInicio,
 								horaTermino=horaTermino,
 								duracao=duracao,
-								numCobertas=numCobertas)
-		
+								numCobertas=numCobertas)	
 	elif nomeTabela == 'ObjetosEvento':
 		descricao      = post['descricao']
 		obj            = ObjetosEvento(descricao=descricao)
@@ -395,7 +393,14 @@ def montarObjetoSalvar(nomeTabela,post):
 						        cidade=cidade)
 
 	return obj
-	
+
+def converterMoneyParaBanco(valor):
+	temp  = valor
+	temp  = temp[0:1] + temp[2:5] + "." + temp[6:8]
+	temp  = float(temp)
+
+	return temp
+
 def definirTabela(path):
 	tela = path
 	tela = tela.split('/')
