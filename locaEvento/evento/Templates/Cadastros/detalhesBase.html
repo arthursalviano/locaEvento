@@ -153,8 +153,6 @@
 		{% endfor %}
 	{% endif %}
 
-
-
 	{# Tipo de Evento #}
 
 	{% if nomeTela == "TipoEvento" or nomeTela == "ObjetosEvento" or nomeTela == "Cor" %}
@@ -238,7 +236,6 @@
 				<th>Duração</th>
 				<th>Número de cobertas </th>
 				<th>Cor da coberta</th>
-				<th>Parcelas</th>
 				<th>Valor total</th>
 				<th>Editar?</th>
 				<th>Excluir?</th>
@@ -264,7 +261,6 @@
 						{{ item.corCoberta }}
 					{% endif %}
 				</td>
-				<td>{{ item.parcelas }}</td>
 				<td>{{ item.valorTotal }}</td>
 				<td><a class="btn btn-warning" href="editar/{{ item.id }}/"><i class="glyphicon glyphicon-edit"></i></a></td>
 				<td><a id="deletar/{{ item.id }}/" role="button" href="#confirmarExclusao" class="btn btn-danger excluir" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i></a></td>
