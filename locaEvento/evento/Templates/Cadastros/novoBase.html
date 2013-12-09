@@ -14,7 +14,7 @@
 		$("#RG").mask("999.999.999");
 		$("#CPF").mask("999.999.999-99");
 		$("#valorTotal").mask("9.999,99");
-		$(".parcelaText").mask("9.999,99");
+		$(".parcelaText").mask("999,99");
 
 
 		{# o botão que ativa a mensagem de salvo com sucesso é ativado aqui. #}
@@ -155,6 +155,35 @@
 			}
 		);
 
+		{# verificação de valores das parcelas em comparação com o valor total #}
+		$('.parcelaText').change(
+			function(){
+				
+				var values = $("#valorTotal").val().split(".");
+				var v1 = values[0];
+				var v2 = values[1].replace(',','.');
+				total  = parseFloat(v1 + v2);
+				
+				if ($("#valorSubTotal").html() != 0){
+					temp = $("#valorSubTotal").html();
+					subTotal = temp.substr(0,3) + '.'+temp.substr(4,2)
+					subTotal = parseFloat(subTotal);
+				}else{
+					subTotal = 0;
+				}
+				temp = $(this).val();
+				subTotal = subTotal + parseFloat(temp.substr(0,3) + '.'+temp.substr(4,2));
+
+				alert($("#valorSubTotal").html());
+
+				if (subTotal > total){
+					alert('somatório das parcelas excede o valor total!');
+				}else{
+					$('#valorSubTotal').html(subTotal);
+				}
+			}
+		);
+
 		{# aqui são setados os combos em caso de edição #}
 
 		{% ifequal editar "editar" %}
@@ -195,6 +224,8 @@
 			$("#valorTotal").mask("9.999,99");
 			
 		{% endifequal %}
+
+
 	
 {% endblock %}
 
@@ -732,6 +763,12 @@
 		    				>
 		    			</div>
 					</div>
+					<div class="col-xs-4 parcelas">
+						<div class="subtotal">
+		    				<label><h3>Subtotal</h3></label>
+		    				<label><h4 id='valorSubTotal'>0</h4></label>
+		    			</div>
+					</div>
 		  		</div>
 		  	</div>
 		</div>
@@ -740,7 +777,7 @@
 		
 		{% block botoes %}
 		<div class="form-actions">
-  			<button type="submit" class="btn btn-primary btn-lg" ><i class="glyphicon glyphicon-plus-sign glyphicon-white"></i> Salvar</button>
+  			<button type="submit" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-plus-sign glyphicon-white"></i> Salvar</button>
   			<a class="btn btn-danger btn-lg" href="http://localhost:8000/cadastros/{{ nomeTela }}/detalhes/"><i class="glyphicon glyphicon-remove-sign glyphicon-white"></i> Cancelar</a>
   		</div>
   		{% endblock %}
