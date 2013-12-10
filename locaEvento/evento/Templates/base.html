@@ -4,11 +4,14 @@
   <head>
     <title> Loca Evento </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Latest compiled and minified CSS -->
+    
+    <!-- Importação das folhas de estilo -->
     <link rel="stylesheet" href="{% static "Bootstrap/css/bootstrap.min.css" %}">
     <link rel="stylesheet" href="{% static "Bootstrap/css/bootstrap-theme.min.css" %}">
     <link rel="stylesheet" href="{% static "Bootstrap/css/bootstrap-responsive.min.css" %}">
-    <style >
+    
+    <!-- Estilo referente ao efeito de carregamento das páginas -->
+    <style>
       .loader {
         position: fixed;
         left: 0px;
@@ -18,9 +21,7 @@
         z-index: 9999;
         background: url("{% static "Bootstrap/img/page-loader.gif" %}") 50% 50% no-repeat rgb(249,249,249);
       }
-  </style>
-    
-    <!-- Bootstrap -->
+    </style>
   </head>
   <body>
 	  <ol class="breadcrumb">
@@ -45,7 +46,14 @@
     
    {% block content %} 
    {% endblock %}
- <!-- Latest compiled and minified JavaScript -->
+
+   <div class="container">  
+      <div class="page-header">
+        {% block head %}
+        <h1>LocaEvento <small>Sistema de controle de eventos</small></h1>
+        {% endblock %}
+      </div>
+    </div>
  
   <script src="{% static "jQuery/jquery-2.0.3.js" %}"></script>
   <script src="{% static "Bootstrap/js/bootstrap.min.js" %}"></script>
